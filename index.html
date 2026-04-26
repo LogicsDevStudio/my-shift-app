@@ -73,11 +73,17 @@
         </div>
         <div class="offcanvas-body bg-light">
             <div class="container mt-4">
-                <div class="row g-4 text-center">
+                <div class="row g-4 text-center justify-content-center">
                     <div class="col-6 col-md-4 col-lg-2">
                         <div class="card menu-card shadow-sm py-4" onclick="switchView('calendar')" data-bs-dismiss="offcanvas">
                             <div class="display-5 mb-2">📅</div>
                             <h6 class="fw-bold">ปฏิทินเวร</h6>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card shadow-sm py-4" onclick="openFastAddModal()" data-bs-dismiss="offcanvas">
+                            <div class="display-5 mb-2">⚡</div>
+                            <h6 class="fw-bold">ระบุเวรด่วน</h6>
                         </div>
                     </div>
                     <div class="col-6 col-md-4 col-lg-2">
@@ -106,11 +112,10 @@
     <div class="container mt-4 mb-5">
         
         <section id="view-calendar" class="view-section active">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="fw-bold mb-0">ปฏิทินปฏิบัติงาน</h4>
-                <button class="btn btn-success rounded-pill fw-bold" onclick="openFastAddModal()">
-                    <i class="fa-solid fa-bolt me-2"></i> ระบุเวรด่วน
-                </button>
+            <h4 class="fw-bold mb-3">ปฏิทินปฏิบัติงาน</h4>
+            
+            <div id="todayStatusHighlight" class="alert alert-secondary shadow-sm fw-bold mb-3 d-flex align-items-center">
+                <i class="fa-solid fa-spinner fa-spin me-2"></i> กำลังตรวจสอบข้อมูลวันนี้...
             </div>
 
             <div class="row g-4">
@@ -262,7 +267,7 @@
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.getElementById('view-' + viewId).classList.add('active');
             
-            // แจ้งให้ Calendar อัปเดตขนาดเมื่อแสดงผล เพื่อแก้ปัญหาปฏิทินเพี้ยนโดยไม่ต้องรีเฟรช
+            // แจ้งให้ Calendar อัปเดตขนาดเมื่อแสดงผล
             if (viewId === 'calendar' && window.calendarInstance) {
                 setTimeout(() => {
                     window.calendarInstance.updateSize();

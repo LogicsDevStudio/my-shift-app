@@ -1,612 +1,505 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radiology Shift Pro - Vibrant Edition</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radiology Shift Pro</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <style>
-        :root {
-            /* Vibrant Color Palette */
-            --primary-color: #8b5cf6; /* Vivid Violet */
-            --secondary-color: #ec4899; /* Hot Pink */
-            --accent-color: #f59e0b; /* Bright Amber */
-            --success-color: #10b981; /* Emerald */
-            
-            /* Gradients */
-            --primary-gradient: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
-            --sunset-gradient: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
-            --ocean-gradient: linear-gradient(135deg, #2dd4bf 0%, #3b82f6 100%);
-            --bg-gradient: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
-            --mesh-bg: radial-gradient(at 40% 20%, hsla(267,100%,84%,0.3) 0px, transparent 50%),
-                       radial-gradient(at 80% 0%, hsla(330,100%,86%,0.3) 0px, transparent 50%),
-                       radial-gradient(at 0% 50%, hsla(186,100%,82%,0.3) 0px, transparent 50%);
-            
-            /* Surface & Text */
-            --surface-color: rgba(255, 255, 255, 0.85); /* Glass effect */
-            --surface-solid: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border-color: rgba(255, 255, 255, 0.6);
-            
-            /* Borders & Shadows */
-            --radius-md: 16px;
-            --radius-lg: 24px;
-            --shadow-sm: 0 4px 15px rgba(0, 0, 0, 0.05);
-            --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-            --shadow-hover: 0 20px 40px -10px rgba(236, 72, 153, 0.35);
-        }
+    <style>
+        :root {
+            --primary-color: #6366f1; /* Vibrant Indigo */
+            --primary-hover: #4f46e5;
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            --accent-color: #f43f5e;  /* Bright Rose */
+            --bg-color: #f4f6f9;
+            --surface-color: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --shadow-soft: 0 15px 35px -5px rgba(99, 102, 241, 0.08);
+            --shadow-hover: 0 20px 40px -10px rgba(99, 102, 241, 0.2);
+        }
 
-        body { 
-            font-family: 'Prompt', sans-serif; 
-            background-color: #f8fafc;
-            background-image: var(--mesh-bg);
-            background-attachment: fixed;
-            color: var(--text-main); 
-            -webkit-font-smoothing: antialiased;
-            letter-spacing: 0.2px;
-            min-height: 100vh;
-        }
+        body { 
+            font-family: 'Prompt', sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            -webkit-font-smoothing: antialiased;
+            letter-spacing: 0.2px;
+        }
 
-        /* Navbar - Enhanced Glassmorphism */
-        .navbar { 
-            background-color: rgba(255, 255, 255, 0.7) !important; 
-            backdrop-filter: blur(15px) saturate(200%);
-            -webkit-backdrop-filter: blur(15px) saturate(200%);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.5); 
-            box-shadow: var(--shadow-glass);
-        }
-        .navbar-brand { 
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px; 
-            font-size: 1.5rem;
-            font-weight: 800 !important;
-        }
+        /* Navbar - Glassmorphism */
+        .navbar { 
+            background-color: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3); 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+        }
+        .navbar-brand { 
+            color: var(--primary-color) !important; 
+            letter-spacing: -0.5px; 
+            font-size: 1.3rem;
+        }
 
-        /* Typography & Forms */
-        h4, h5, h6 { font-weight: 600; color: var(--text-main); }
-        .text-primary { color: var(--primary-color) !important; }
-        .text-danger { color: var(--secondary-color) !important; }
-        .text-muted { color: var(--text-muted) !important; }
-        
-        .form-control {
-            border-radius: 12px;
-            border: 2px solid transparent;
-            padding: 0.8rem 1.2rem;
-            background-color: rgba(255,255,255,0.9);
-            transition: all 0.3s ease;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-            font-size: 0.95rem;
-        }
-        .form-control:focus {
-            background-color: var(--surface-solid);
-            border-color: #c4b5fd;
-            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2) !important;
-        }
+        /* Typography & Forms */
+        h4, h5, h6 { font-weight: 600; color: var(--text-main); }
+        .text-primary { color: var(--primary-color) !important; }
+        .text-danger { color: var(--accent-color) !important; }
+        .text-muted { color: var(--text-muted) !important; }
+        
+        .form-control {
+            border-radius: 12px;
+            border: 1px solid transparent;
+            padding: 0.8rem 1.2rem;
+            background-color: #f1f5f9;
+            transition: all 0.3s ease;
+            box-shadow: none !important;
+            font-size: 0.95rem;
+        }
+        .form-control:focus {
+            background-color: var(--surface-color);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15) !important;
+        }
 
-        /* Vibrant Buttons */
-        .btn { 
-            border-radius: 12px; 
-            font-weight: 600; 
-            padding: 0.7rem 1.5rem; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-            border: none;
-        }
-        .btn-primary { 
-            background: var(--primary-gradient); 
-            color: white;
-            box-shadow: 0 8px 15px rgba(139, 92, 246, 0.2);
-        }
-        .btn-primary:hover { 
-            transform: translateY(-3px); 
-            box-shadow: var(--shadow-hover); 
-            color: white;
-        }
-        .btn-success { 
-            background: var(--ocean-gradient); 
-            color: white; 
-            box-shadow: 0 8px 15px rgba(45, 212, 191, 0.2);
-        }
-        .btn-success:hover { 
-            transform: translateY(-3px); 
-            box-shadow: 0 15px 30px rgba(45, 212, 191, 0.4); 
-            color: white;
-        }
-        .btn-danger { 
-            background: var(--sunset-gradient); 
-            color: white; 
-            box-shadow: 0 8px 15px rgba(255, 126, 95, 0.2);
-        }
-        .btn-danger:hover {
-            transform: translateY(-3px); 
-            box-shadow: 0 15px 30px rgba(255, 126, 95, 0.4); 
-        }
-        .btn-light { 
-            background: rgba(255,255,255,0.9); 
-            border: 1px solid rgba(255,255,255,0.5); 
-            color: var(--primary-color); 
-            box-shadow: var(--shadow-sm);
-        }
-        .btn-light:hover { 
-            background: white; 
-            transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.05);
-        }
+        /* Buttons */
+        .btn { 
+            border-radius: 12px; 
+            font-weight: 500; 
+            padding: 0.7rem 1.5rem; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            box-shadow: none !important; 
+        }
+        .btn-primary { 
+            background: var(--primary-gradient); 
+            border: none; 
+            color: white;
+        }
+        .btn-primary:hover { 
+            transform: translateY(-2px); 
+            box-shadow: var(--shadow-hover) !important; 
+        }
+        .btn-success { background-color: #10b981; border-color: #10b981; }
+        .btn-success:hover { background-color: #059669; border-color: #059669; transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.3) !important; }
+        .btn-danger { background-color: var(--accent-color); border: none; }
+        .btn-light { background-color: var(--surface-color); border: 1px solid var(--border-color); color: var(--text-main); }
+        .btn-light:hover { background-color: #f8fafc; border-color: #cbd5e1; }
 
-        /* Cards & Layout */
-        .card, .calendar-card { 
-            background: var(--surface-color); 
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border-color) !important; 
-            border-radius: var(--radius-lg); 
-            box-shadow: var(--shadow-glass) !important; 
-            overflow: hidden;
-        }
-        .calendar-card { padding: 24px; background: rgba(255, 255, 255, 0.95); }
-        
-        .summary-card { 
-            border-radius: var(--radius-lg); 
-        }
-        .summary-card .card-header { 
-            background: transparent; 
-            border-bottom: 1px dashed rgba(0,0,0,0.1); 
-        }
+        /* Cards & Layout */
+        .card, .calendar-card { 
+            background: var(--surface-color); 
+            border: none !important; 
+            border-radius: var(--radius-lg); 
+            box-shadow: var(--shadow-soft) !important; 
+            overflow: hidden;
+        }
+        .calendar-card { padding: 24px; }
+        
+        .summary-card { 
+            border-radius: var(--radius-lg); 
+            box-shadow: var(--shadow-sm) !important; 
+            border: 1px solid var(--border-color) !important; 
+            background: var(--surface-color); 
+        }
+        .summary-card .card-header { 
+            background: rgba(248, 250, 252, 0.5); 
+            border-bottom: 1px solid var(--border-color); 
+        }
 
-        /* FullCalendar Beautiful Overrides */
-        .fc-theme-standard td, .fc-theme-standard th { 
-            border-color: rgba(0,0,0,0.04); 
-        }
-        .fc-theme-standard th {
-            background: var(--primary-gradient);
-            color: white;
-            padding: 12px 0 !important;
-            font-weight: 500;
-            border: none !important;
-        }
-        .fc-theme-standard th .fc-scrollgrid-sync-inner {
-            padding: 4px 0;
-        }
-        .fc .fc-toolbar-title { 
-            font-weight: 800; 
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 1.6rem; 
-            letter-spacing: -0.5px; 
-        }
-        .fc .fc-button-primary { 
-            background: rgba(255,255,255,0.8); 
-            color: var(--primary-color); 
-            border: 1px solid rgba(139, 92, 246, 0.2); 
-            text-transform: capitalize; 
-            border-radius: 12px;
-            font-weight: 600;
-            padding: 0.5rem 1.2rem;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.3s ease;
-        }
-        .fc .fc-button-primary:hover { 
-            background: var(--primary-gradient); 
-            color: white; 
-            border-color: transparent; 
-            transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(139, 92, 246, 0.3);
-        }
-        .fc .fc-button-active { 
-            background: var(--primary-gradient) !important; 
-            color: white !important; 
-            border-color: transparent !important; 
-        }
-        .fc-day-today {
-            background: rgba(139, 92, 246, 0.05) !important;
-        }
-        .fc-event { 
-            border: none !important; 
-            padding: 5px 10px; 
-            font-weight: 600; 
-            border-radius: 8px; 
-            font-size: 0.85rem; 
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1); 
-            transition: transform 0.2s;
-        }
-        .fc-event:hover {
-            transform: scale(1.02);
-            z-index: 5;
-        }
-        
-        /* Menu Cards (Offcanvas) */
-        .menu-card { 
-            background-color: rgba(255,255,255,0.8);
-            backdrop-filter: blur(5px);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            border-radius: var(--radius-md); 
-            border: 1px solid rgba(255,255,255,0.8) !important; 
-            cursor: pointer; 
-            box-shadow: var(--shadow-sm) !important;
-            padding: 24px 16px;
-        }
-        .menu-card:hover { 
-            transform: translateY(-8px); 
-            border-color: rgba(139, 92, 246, 0.3) !important; 
-            box-shadow: var(--shadow-hover) !important; 
-            background: white;
-        }
-        .menu-icon { 
-            font-size: 1.8rem; 
-            width: 64px;
-            height: 64px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border-radius: 20px;
-            color: var(--primary-color); 
-            margin-bottom: 16px; 
-            transition: all 0.4s ease; 
-            box-shadow: inset 0 2px 4px white, 0 4px 10px rgba(0,0,0,0.05);
-        }
-        .menu-card:hover .menu-icon { 
-            background: var(--primary-gradient);
-            color: white !important;
-            transform: scale(1.15) rotate(8deg); 
-            box-shadow: 0 15px 25px rgba(139, 92, 246, 0.4);
-        }
-        .menu-card:active { transform: scale(0.95); }
+        /* FullCalendar Minimal Overrides */
+        .fc-theme-standard td, .fc-theme-standard th { border-color: #f1f5f9; }
+        .fc .fc-toolbar-title { font-weight: 700; color: var(--text-main); font-size: 1.3rem; letter-spacing: -0.5px; }
+        .fc .fc-button-primary { 
+            background-color: var(--surface-color); 
+            color: var(--text-main); 
+            border: 1px solid var(--border-color); 
+            text-transform: capitalize; 
+            border-radius: 10px;
+            font-weight: 500;
+            padding: 0.4rem 1rem;
+        }
+        .fc .fc-button-primary:hover { background-color: #f8fafc; color: var(--primary-color); border-color: var(--primary-color); }
+        .fc .fc-button-active { background-color: var(--primary-color) !important; color: white !important; border-color: var(--primary-color) !important; }
+        .fc-event { border: none !important; padding: 4px 8px; font-weight: 500; border-radius: 6px; font-size: 0.8rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        
+        /* Menu Cards (Offcanvas) */
+        .menu-card { 
+            background-color: var(--surface-color);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            border-radius: var(--radius-md); 
+            border: 1px solid var(--border-color) !important; 
+            cursor: pointer; 
+            box-shadow: var(--shadow-sm) !important;
+            padding: 24px 16px;
+        }
+        .menu-card:hover { 
+            transform: translateY(-5px); 
+            border-color: var(--primary-color) !important; 
+            box-shadow: var(--shadow-hover) !important; 
+            background: linear-gradient(to bottom, #ffffff, #f8fafc);
+        }
+        .menu-icon { 
+            font-size: 1.5rem; 
+            width: 56px;
+            height: 56px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f1f5f9;
+            border-radius: 16px;
+            color: var(--primary-color); 
+            margin-bottom: 16px; 
+            transition: all 0.3s ease; 
+        }
+        .menu-card:hover .menu-icon { 
+            background-color: var(--primary-color);
+            color: white !important;
+            transform: scale(1.1) rotate(5deg); 
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+        .menu-card:active { transform: scale(0.96); }
 
-        /* Icon Colors Specific */
-        .menu-card:nth-child(2) .menu-icon { color: var(--accent-color); }
-        .menu-card:nth-child(2):hover .menu-icon { background: var(--sunset-gradient); box-shadow: 0 15px 25px rgba(245, 158, 11, 0.4); }
-        .menu-card:nth-child(4) .menu-icon { color: var(--success-color); }
-        .menu-card:nth-child(4):hover .menu-icon { background: var(--ocean-gradient); box-shadow: 0 15px 25px rgba(16, 185, 129, 0.4); }
+        /* Icon Colors Specific */
+        .menu-card:nth-child(2):hover .menu-icon { background-color: #f59e0b; box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3); }
+        .menu-card:nth-child(4):hover .menu-icon { background-color: #10b981; box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3); }
+        .menu-card:nth-child(2) .menu-icon { color: #f59e0b; }
+        .menu-card:nth-child(4) .menu-icon { color: #10b981; }
 
-        /* Utilities */
-        .view-section { display: none; animation: fadeInScale 0.5s cubic-bezier(0.175, 0.885, 0.32, 1); }
-        .view-section.active { display: block; }
-        @keyframes fadeInScale { 
-            from { opacity: 0; transform: translateY(15px) scale(0.98); } 
-            to { opacity: 1; transform: translateY(0) scale(1); } 
-        }
-        
-        .preview-event { padding: 10px 20px; border-radius: 10px; display: inline-block; font-weight: 600; margin-top: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
-        .list-group-item { border-color: rgba(0,0,0,0.05); padding: 16px; transition: background 0.2s; background: transparent; }
-        .list-group-item:hover { background-color: rgba(255,255,255,0.5); }
-        
-        /* Day Buttons */
-        .day-btn { flex: 1; border-radius: 12px; font-weight: 600; transition: all 0.3s; border: 1px solid rgba(0,0,0,0.05); background: rgba(255,255,255,0.8); color: var(--text-muted); box-shadow: var(--shadow-sm); }
-        .day-btn:hover { background: white; color: var(--primary-color); transform: translateY(-2px); }
-        .day-btn.active { background: var(--primary-gradient); color: white; border: none; box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4); transform: translateY(-2px); }
-        
-        .holiday-event { pointer-events: none; opacity: 0.9; font-size: 0.75rem; background: transparent !important; color: var(--secondary-color) !important; border-left: 4px solid var(--secondary-color) !important; border-radius: 0 4px 4px 0; padding-left: 8px; font-weight: bold; }
+        /* Utilities */
+        .view-section { display: none; animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .preview-event { padding: 8px 16px; border-radius: 8px; display: inline-block; font-weight: 500; margin-top: 10px; box-shadow: var(--shadow-sm); }
+        .list-group-item { border-color: var(--border-color); padding: 16px; transition: background 0.2s; }
+        .list-group-item:hover { background-color: #f8fafc; }
+        
+        /* Day Buttons */
+        .day-btn { flex: 1; border-radius: 12px; font-weight: 500; transition: all 0.2s; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--text-muted); }
+        .day-btn:hover { background: #f8fafc; color: var(--text-main); border-color: #cbd5e1; }
+        .day-btn.active { background: var(--primary-gradient); color: white; border: none; box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3); }
+        
+        .holiday-event { pointer-events: none; opacity: 0.85; font-size: 0.75rem; background: transparent !important; color: var(--text-muted) !important; border-left: 3px solid var(--accent-color) !important; border-radius: 0; padding-left: 8px; }
 
-        /* Floating Fast Add Bar */
-        #fastAddBar { 
-            background: rgba(255, 255, 255, 0.85); 
-            backdrop-filter: blur(20px) saturate(200%); 
-            border-top: 1px solid rgba(255, 255, 255, 0.8) !important; 
-            box-shadow: 0 -15px 40px rgba(139, 92, 246, 0.1) !important; 
-            border-radius: 30px 30px 0 0;
-            padding-bottom: env(safe-area-inset-bottom, 1rem);
-        }
+        /* Floating Fast Add Bar */
+        #fastAddBar { 
+            background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(16px) saturate(180%); 
+            border-top: 1px solid rgba(255, 255, 255, 0.4) !important; 
+            box-shadow: 0 -15px 40px rgba(0,0,0,0.06) !important; 
+            border-radius: 24px 24px 0 0;
+        }
 
-        /* Modal Enhancements */
-        .modal-content {
-            border-radius: var(--radius-lg);
-            border: 1px solid rgba(255,255,255,0.8);
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 25px 50px -12px rgba(139, 92, 246, 0.25);
-        }
+        /* Modal Enhancements */
+        .modal-content {
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255,255,255,0.4);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
 
-        /* Today Alert Pill */
-        #todayStatusHighlight {
-            border-radius: 50px !important;
-            border: 1px solid rgba(139, 92, 246, 0.2) !important;
-            background: linear-gradient(to right, rgba(255,255,255,0.9), rgba(243, 232, 255, 0.5)) !important;
-            box-shadow: var(--shadow-sm);
-            padding: 12px 24px;
-        }
+        /* Today Alert Pill */
+        #todayStatusHighlight {
+            border-radius: 50px !important;
+            border: 1px solid rgba(99, 102, 241, 0.2) !important;
+            background: linear-gradient(to right, #ffffff, #f8fafc) !important;
+            box-shadow: var(--shadow-sm);
+            padding: 12px 24px;
+        }
 
-        /* Gradient Text Helper */
-        .text-gradient {
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        @media print {
-            .navbar, .offcanvas, .btn, #fastAddBar, .summary-card { display: none !important; }
-            .calendar-card { box-shadow: none !important; border: none !important; padding: 0 !important; background: white !important;}
-            body { background: white !important; }
-            .fc-theme-standard th { background: #f8fafc !important; color: black !important; }
-        }
-    </style>
+        @media print {
+            .navbar, .offcanvas, .btn, #fastAddBar, .summary-card { display: none !important; }
+            .calendar-card { box-shadow: none !important; border: none !important; padding: 0 !important; }
+            body { background: white; }
+        }
+    </style>
 </head>
 <body>
 
-    <nav class="navbar sticky-top">
-        <div class="container d-flex align-items-center">
-            <button class="btn btn-light rounded-pill px-4 py-2 border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#fullScreenMenu">
-                <i class="fa-solid fa-bars me-2 text-primary"></i> <span class="fw-bold text-gradient">เมนู</span>
-            </button>
-            <span class="navbar-brand mx-auto"><i class="fa-solid fa-notes-medical me-2 text-primary"></i>Radiology Shift Pro</span>
-            <div style="width: 105px;"></div> 
-        </div>
-    </nav>
+    <nav class="navbar sticky-top">
+        <div class="container d-flex align-items-center">
+            <button class="btn btn-light rounded-pill px-4 py-2 border-0 shadow-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#fullScreenMenu">
+                <i class="fa-solid fa-bars me-2 text-primary"></i> <span class="fw-medium">เมนู</span>
+            </button>
+            <span class="navbar-brand fw-bold mx-auto"><i class="fa-solid fa-notes-medical me-2"></i>Radiology Shift Pro</span>
+            <div style="width: 95px;"></div> 
+        </div>
+    </nav>
 
-    <div id="fastAddBar" class="fixed-bottom p-3 d-none" style="z-index: 1050;">
-        <div class="container">
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-bolt text-warning me-2 fs-5" style="filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.5));"></i> โหมดลงเวรด่วน: <span id="fastAddDateLabel" class="text-primary ms-1"></span></h6>
-                <button class="btn btn-sm btn-light text-muted border-0 rounded-pill px-4 fw-bold" onclick="toggleFastAdd(false)">ปิดโหมดนี้</button>
-            </div>
-            <div id="fastAddButtons" class="d-flex gap-2 overflow-auto pb-2 custom-scrollbar"></div>
-        </div>
-    </div>
+    <div id="fastAddBar" class="fixed-bottom p-3 d-none" style="z-index: 1050;">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-bolt text-warning me-2 fs-5"></i> โหมดลงเวรด่วน: <span id="fastAddDateLabel" class="text-primary ms-1"></span></h6>
+                <button class="btn btn-sm btn-light text-muted border-0 rounded-pill px-4" onclick="toggleFastAdd(false)">ปิดโหมดนี้</button>
+            </div>
+            <div id="fastAddButtons" class="d-flex gap-2 overflow-auto pb-2 custom-scrollbar"></div>
+        </div>
+    </div>
 
-    <div class="modal fade" id="fastAddDateModal" tabindex="-1">
-        <div class="modal-dialog modal-sm modal-dialog-centered">
-            <div class="modal-content border-0">
-                <div class="modal-header border-0 pb-0 mt-2">
-                    <h6 class="fw-bold mb-0 text-gradient">เลือกวันเริ่มต้นลงเวร</h6>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body py-4 text-center px-4">
-                    <input type="date" id="fastAddStartDate" class="form-control mb-4 text-center fw-bold text-primary">
-                    <button class="btn btn-primary w-100 py-2 fw-bold rounded-pill" onclick="startFastAdd()">เริ่มระบุเวรด่วน</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="modal fade" id="fastAddDateModal" tabindex="-1">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content border-0">
+                <div class="modal-header border-0 pb-0 mt-2">
+                    <h6 class="fw-bold mb-0">เลือกวันเริ่มต้นลงเวร</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body py-4 text-center px-4">
+                    <input type="date" id="fastAddStartDate" class="form-control mb-4 text-center fw-medium">
+                    <button class="btn btn-primary w-100 py-2 fw-bold rounded-pill" onclick="startFastAdd()">เริ่มระบุเวรด่วน</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <div class="offcanvas offcanvas-top h-100 border-0" tabindex="-1" id="fullScreenMenu" style="background-image: var(--mesh-bg); background-color: #f8fafc;">
-        <div class="offcanvas-header container mt-3 pb-0">
-            <h4 class="offcanvas-title fw-bold text-gradient"><i class="fa-solid fa-layer-group me-2 text-primary"></i>เมนูหลัก</h4>
-            <button type="button" class="btn-close bg-white rounded-circle p-2 shadow-sm" data-bs-dismiss="offcanvas"></button>
-        </div>
-        <div class="offcanvas-body">
-            <div class="container mt-4">
-                <div class="row g-4 text-center justify-content-center">
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100" onclick="switchView('calendar')" data-bs-dismiss="offcanvas">
-                            <div class="menu-icon"><i class="fa-regular fa-calendar-days"></i></div>
-                            <h6 class="fw-bold mb-0 text-secondary-emphasis">ปฏิทินเวร</h6>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100" onclick="openFastAddModal()" data-bs-dismiss="offcanvas">
-                            <div class="menu-icon"><i class="fa-solid fa-bolt"></i></div>
-                            <h6 class="fw-bold mb-0 text-secondary-emphasis">ระบุเวรด่วน</h6>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100" onclick="switchView('settings')" data-bs-dismiss="offcanvas">
-                            <div class="menu-icon"><i class="fa-solid fa-sliders"></i></div>
-                            <h6 class="fw-bold mb-0 text-secondary-emphasis">ตั้งค่าเวร</h6>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100" onclick="switchView('holidays')" data-bs-dismiss="offcanvas">
-                            <div class="menu-icon"><i class="fa-solid fa-umbrella-beach"></i></div>
-                            <h6 class="fw-bold mb-0 text-secondary-emphasis">จัดการวันหยุด</h6>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100" onclick="switchView('system')" data-bs-dismiss="offcanvas">
-                            <div class="menu-icon"><i class="fa-solid fa-gear"></i></div>
-                            <h6 class="fw-bold mb-0 text-secondary-emphasis">ตั้งค่าระบบ</h6>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100" onclick="exportToImage()" data-bs-dismiss="offcanvas">
-                            <div class="menu-icon"><i class="fa-regular fa-image"></i></div>
-                            <h6 class="fw-bold mb-0 text-secondary-emphasis">บันทึกรูปภาพ</h6>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100" onclick="window.print()" data-bs-dismiss="offcanvas">
-                            <div class="menu-icon"><i class="fa-solid fa-print"></i></div>
-                            <h6 class="fw-bold mb-0 text-secondary-emphasis">พิมพ์ / PDF</h6>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100" onclick="exportToICal()" data-bs-dismiss="offcanvas">
-                            <div class="menu-icon"><i class="fa-solid fa-mobile-screen"></i></div>
-                            <h6 class="fw-bold mb-0 text-secondary-emphasis">ซิงก์ iCal</h6>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="offcanvas offcanvas-top h-100 border-0" tabindex="-1" id="fullScreenMenu" style="background-color: var(--bg-color);">
+        <div class="offcanvas-header container mt-3 pb-0">
+            <h4 class="offcanvas-title fw-bold text-primary"><i class="fa-solid fa-layer-group me-2"></i>เมนูหลัก</h4>
+            <button type="button" class="btn-close bg-white rounded-circle p-2 shadow-sm" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="container mt-4">
+                <div class="row g-4 text-center justify-content-center">
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card h-100" onclick="switchView('calendar')" data-bs-dismiss="offcanvas">
+                            <div class="menu-icon"><i class="fa-regular fa-calendar-days"></i></div>
+                            <h6 class="fw-bold mb-0">ปฏิทินเวร</h6>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card h-100" onclick="openFastAddModal()" data-bs-dismiss="offcanvas">
+                            <div class="menu-icon"><i class="fa-solid fa-bolt"></i></div>
+                            <h6 class="fw-bold mb-0">ระบุเวรด่วน</h6>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card h-100" onclick="switchView('settings')" data-bs-dismiss="offcanvas">
+                            <div class="menu-icon"><i class="fa-solid fa-sliders"></i></div>
+                            <h6 class="fw-bold mb-0">ตั้งค่าเวร</h6>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card h-100" onclick="switchView('holidays')" data-bs-dismiss="offcanvas">
+                            <div class="menu-icon"><i class="fa-solid fa-umbrella-beach"></i></div>
+                            <h6 class="fw-bold mb-0">จัดการวันหยุด</h6>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card h-100" onclick="switchView('system')" data-bs-dismiss="offcanvas">
+                            <div class="menu-icon"><i class="fa-solid fa-gear"></i></div>
+                            <h6 class="fw-bold mb-0">ตั้งค่าระบบ</h6>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card h-100" onclick="exportToImage()" data-bs-dismiss="offcanvas">
+                            <div class="menu-icon"><i class="fa-regular fa-image"></i></div>
+                            <h6 class="fw-bold mb-0">บันทึกรูปภาพ</h6>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card h-100" onclick="window.print()" data-bs-dismiss="offcanvas">
+                            <div class="menu-icon"><i class="fa-solid fa-print"></i></div>
+                            <h6 class="fw-bold mb-0">พิมพ์ / PDF</h6>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card h-100" onclick="exportToICal()" data-bs-dismiss="offcanvas">
+                            <div class="menu-icon"><i class="fa-solid fa-mobile-screen"></i></div>
+                            <h6 class="fw-bold mb-0">ซิงก์ iCal</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <div class="container mt-4 mb-5">
-        
-        <section id="view-calendar" class="view-section active">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-2">
-                <h4 class="fw-bold mb-0 text-gradient"><i class="fa-regular fa-calendar-check text-primary me-2"></i>ตารางปฏิบัติงาน</h4>
-            </div>
-            
-            <div id="todayStatusHighlight" class="alert small fw-bold mb-4 d-flex align-items-center">
-                <i class="fa-solid fa-circle-notch fa-spin me-3 text-primary fs-5"></i> 
-                <span class="text-secondary">กำลังตรวจสอบข้อมูลวันนี้...</span>
-            </div>
+    <div class="container mt-4 mb-5">
+        
+        <section id="view-calendar" class="view-section active">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-2">
+                <h4 class="fw-bold mb-0"><i class="fa-regular fa-calendar-check text-primary me-2"></i>ตารางปฏิบัติงาน</h4>
+            </div>
+            
+            <div id="todayStatusHighlight" class="alert small fw-bold mb-4 d-flex align-items-center">
+                <i class="fa-solid fa-circle-notch fa-spin me-3 text-primary fs-5"></i> 
+                <span class="text-secondary">กำลังตรวจสอบข้อมูลวันนี้...</span>
+            </div>
 
-            <div class="row g-4">
-                <div class="col-lg-9">
-                    <div class="calendar-card" id="calendarCaptureArea">
-                        <div id="calendar"></div>
-                    </div>
-                </div>
-                <div class="col-lg-3">
-                    <div class="card summary-card mb-4">
-                        <div class="card-header fw-bold pt-4 pb-3 fs-6 border-0 d-flex align-items-center">
-                            <div class="rounded-circle p-2 shadow-sm me-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: var(--primary-gradient);">
-                                <i class="fa-solid fa-chart-pie text-white"></i>
-                            </div>
-                            <span class="text-gradient fs-5">สรุปเดือนนี้</span>
-                        </div>
-                        <div class="card-body pt-2" id="summaryList"></div>
-                    </div>
-                    <div class="card summary-card">
-                        <div class="card-header fw-bold text-danger pt-4 pb-3 fs-6 border-0 d-flex align-items-center">
-                            <div class="rounded-circle p-2 shadow-sm me-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: var(--sunset-gradient);">
-                                <i class="fa-regular fa-calendar-xmark text-white"></i>
-                            </div>
-                            <span class="fs-5" style="color: var(--secondary-color);">วันหยุดประจำเดือน</span>
-                        </div>
-                        <ul class="list-group list-group-flush border-top-0 border-0 ms-3 me-3 pt-2 pb-2" id="holidayList"></ul>
-                    </div>
-                </div>
-            </div>
-        </section>
+            <div class="row g-4">
+                <div class="col-lg-9">
+                    <div class="calendar-card" id="calendarCaptureArea">
+                        <div id="calendar"></div>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card summary-card mb-4">
+                        <div class="card-header fw-bold pt-3 pb-3 fs-6 border-0 d-flex align-items-center">
+                            <div class="bg-white rounded-circle p-2 shadow-sm me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                <i class="fa-solid fa-chart-pie text-primary"></i>
+                            </div>
+                            สรุปเดือนนี้
+                        </div>
+                        <div class="card-body pt-2" id="summaryList"></div>
+                    </div>
+                    <div class="card summary-card">
+                        <div class="card-header fw-bold text-danger pt-3 pb-3 fs-6 border-0 d-flex align-items-center">
+                            <div class="bg-white rounded-circle p-2 shadow-sm me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                <i class="fa-regular fa-calendar-xmark text-danger"></i>
+                            </div>
+                            วันหยุดประจำเดือน
+                        </div>
+                        <ul class="list-group list-group-flush border-top-0 border-0 ms-3 me-3 pt-2 pb-2" id="holidayList"></ul>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        <section id="view-settings" class="view-section">
-            <div class="row justify-content-center g-4">
-                <div class="col-md-5">
-                    <div class="card p-4 h-100">
-                        <h5 class="fw-bold mb-4 text-gradient"><i class="fa-solid fa-pen-to-square me-2 text-primary"></i>จัดการประเภทเวร</h5>
-                        <div class="mb-4">
-                            <label class="form-label small text-muted fw-bold">ชื่อเวร (เช่น เช้า, บ่าย, ดึก)</label>
-                            <input type="text" id="typeName" class="form-control" placeholder="ระบุชื่อเวร">
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label small text-muted fw-bold">กำหนดสี</label>
-                            <input type="color" id="typeColor" class="form-control form-control-color w-100 border-0 p-0 rounded-3 overflow-hidden shadow-sm" style="height: 50px; cursor: pointer;" value="#8b5cf6">
-                        </div>
-                        <div class="mb-3 p-3 rounded-4 border" style="background: rgba(255,255,255,0.6);">
-                            <div class="form-check form-switch d-flex align-items-center p-0">
-                                <label class="form-check-label small text-dark fw-bold flex-grow-1" for="toggleTime">ระบุช่วงเวลา (ไม่บังคับ)</label>
-                                <input class="form-check-input ms-0 mt-0" type="checkbox" id="toggleTime" style="width: 2.5em; height: 1.25em; cursor: pointer;">
-                            </div>
-                        </div>
-                        <div id="timeInputSection" style="display: none;">
-                            <div class="row g-3">
-                                <div class="col-6">
-                                    <label class="small text-muted mb-1 fw-bold">เวลาเริ่มต้น</label>
-                                    <input type="time" id="startTime" class="form-control">
-                                </div>
-                                <div class="col-6">
-                                    <label class="small text-muted mb-1 fw-bold">เวลาสิ้นสุด</label>
-                                    <input type="time" id="endTime" class="form-control">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-4 border-top pt-4 text-center">
-                            <span class="text-muted small d-block mb-3 fw-bold">ตัวอย่างการแสดงผลบนปฏิทิน</span>
-                            <div id="previewEvent" class="preview-event text-white" style="background: var(--primary-gradient);">ชื่อเวร</div>
-                        </div>
-                        <button class="btn btn-primary w-100 mt-4 py-3 fw-bold rounded-pill" id="saveTypeBtn">บันทึกประเภทเวร</button>
-                    </div>
-                </div>
-                <div class="col-md-7">
-                    <div class="card p-4 h-100">
-                        <h5 class="fw-bold mb-4 text-secondary-emphasis"><i class="fa-solid fa-list-check me-2 text-primary"></i>รายการประเภทเวรทั้งหมด</h5>
-                        <div id="shiftTypeList" class="list-group list-group-flush rounded-4 border" style="background: rgba(255,255,255,0.5);"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <section id="view-settings" class="view-section">
+            <div class="row justify-content-center g-4">
+                <div class="col-md-5">
+                    <div class="card p-4 h-100">
+                        <h5 class="fw-bold mb-4 text-primary"><i class="fa-solid fa-pen-to-square me-2"></i>จัดการประเภทเวร</h5>
+                        <div class="mb-4">
+                            <label class="form-label small text-muted fw-bold">ชื่อเวร (เช่น เช้า, บ่าย, ดึก)</label>
+                            <input type="text" id="typeName" class="form-control" placeholder="ระบุชื่อเวร">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label small text-muted fw-bold">กำหนดสี</label>
+                            <input type="color" id="typeColor" class="form-control form-control-color w-100 border-0 p-0 rounded-3 overflow-hidden shadow-sm" style="height: 45px; cursor: pointer;" value="#6366f1">
+                        </div>
+                        <div class="mb-3 bg-light p-3 rounded-3 border">
+                            <div class="form-check form-switch d-flex align-items-center p-0">
+                                <label class="form-check-label small text-dark fw-bold flex-grow-1" for="toggleTime">ระบุช่วงเวลา (ไม่บังคับ)</label>
+                                <input class="form-check-input ms-0 mt-0" type="checkbox" id="toggleTime" style="width: 2.5em; height: 1.25em; cursor: pointer;">
+                            </div>
+                        </div>
+                        <div id="timeInputSection" style="display: none;">
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <label class="small text-muted mb-1 fw-bold">เวลาเริ่มต้น</label>
+                                    <input type="time" id="startTime" class="form-control">
+                                </div>
+                                <div class="col-6">
+                                    <label class="small text-muted mb-1 fw-bold">เวลาสิ้นสุด</label>
+                                    <input type="time" id="endTime" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 border-top pt-4 text-center">
+                            <span class="text-muted small d-block mb-3 fw-bold">ตัวอย่างการแสดงผลบนปฏิทิน</span>
+                            <div id="previewEvent" class="preview-event text-white" style="background: var(--primary-color);">ชื่อเวร</div>
+                        </div>
+                        <button class="btn btn-primary w-100 mt-4 py-2 fw-bold" id="saveTypeBtn">บันทึกประเภทเวร</button>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="card p-4 h-100">
+                        <h5 class="fw-bold mb-4"><i class="fa-solid fa-list-check me-2 text-muted"></i>รายการประเภทเวรทั้งหมด</h5>
+                        <div id="shiftTypeList" class="list-group list-group-flush rounded-3 border"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        <section id="view-holidays" class="view-section">
-            <div class="row justify-content-center g-4">
-                <div class="col-md-5">
-                    <div class="card p-4 h-100">
-                        <h5 class="fw-bold mb-4 text-gradient" id="holidayFormTitle"><i class="fa-solid fa-calendar-plus me-2 text-primary"></i>เพิ่มวันหยุดใหม่</h5>
-                        <input type="hidden" id="editHolidayId">
-                        <div class="mb-4">
-                            <label class="form-label small text-muted fw-bold">วันที่หยุด</label>
-                            <input type="date" id="holidayDate" class="form-control">
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label small text-muted fw-bold">ชื่อวันหยุด / เทศกาล</label>
-                            <input type="text" id="holidayName" class="form-control" placeholder="เช่น วันปีใหม่, วันหยุดพิเศษ">
-                        </div>
-                        <div class="d-flex flex-column gap-2 mt-4">
-                            <button class="btn btn-primary w-100 py-3 fw-bold rounded-pill" id="saveHolidayBtn">บันทึกวันหยุด</button>
-                            <button class="btn btn-light w-100 py-2 fw-bold d-none text-danger rounded-pill" id="cancelEditHolidayBtn">ยกเลิกแก้ไข</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-7">
-                    <div class="card p-4 h-100">
-                        <h5 class="fw-bold mb-4 text-secondary-emphasis"><i class="fa-solid fa-list me-2 text-primary"></i>รายการวันหยุดที่กำหนดเอง</h5>
-                        <div id="customHolidayList" class="list-group list-group-flush rounded-4 border" style="background: rgba(255,255,255,0.5);"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <section id="view-holidays" class="view-section">
+            <div class="row justify-content-center g-4">
+                <div class="col-md-5">
+                    <div class="card p-4 h-100">
+                        <h5 class="fw-bold mb-4 text-primary" id="holidayFormTitle"><i class="fa-solid fa-calendar-plus me-2"></i>เพิ่มวันหยุดใหม่</h5>
+                        <input type="hidden" id="editHolidayId">
+                        <div class="mb-4">
+                            <label class="form-label small text-muted fw-bold">วันที่หยุด</label>
+                            <input type="date" id="holidayDate" class="form-control">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label small text-muted fw-bold">ชื่อวันหยุด / เทศกาล</label>
+                            <input type="text" id="holidayName" class="form-control" placeholder="เช่น วันปีใหม่, วันหยุดพิเศษ">
+                        </div>
+                        <div class="d-flex flex-column gap-2 mt-4">
+                            <button class="btn btn-primary w-100 py-2 fw-bold" id="saveHolidayBtn">บันทึกวันหยุด</button>
+                            <button class="btn btn-light w-100 py-2 fw-bold d-none text-danger" id="cancelEditHolidayBtn">ยกเลิกแก้ไข</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="card p-4 h-100">
+                        <h5 class="fw-bold mb-4"><i class="fa-solid fa-list me-2 text-muted"></i>รายการวันหยุดที่กำหนดเอง</h5>
+                        <div id="customHolidayList" class="list-group list-group-flush rounded-3 border"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        <section id="view-system" class="view-section">
-            <div class="row justify-content-center">
-                <div class="col-md-8">
-                    <div class="card p-4 border-0">
-                        <h5 class="fw-bold mb-4 text-gradient"><i class="fa-solid fa-screwdriver-wrench me-2 text-primary"></i>ตั้งค่าระบบและปฏิทิน</h5>
-                        <div class="mb-2 p-4 rounded-4 border" style="background: rgba(255,255,255,0.6);">
-                            <label class="form-label text-dark fw-bold mb-3 fs-6">เลือกวันเริ่มต้นของสัปดาห์</label>
-                            <div class="d-flex flex-wrap gap-2" id="dayOfWeekSelector">
-                                <button class="btn day-btn" data-day="0">อาทิตย์</button>
-                                <button class="btn day-btn" data-day="1">จันทร์</button>
-                                <button class="btn day-btn" data-day="2">อังคาร</button>
-                                <button class="btn day-btn" data-day="3">พุธ</button>
-                                <button class="btn day-btn" data-day="4">พฤหัสฯ</button>
-                                <button class="btn day-btn" data-day="5">ศุกร์</button>
-                                <button class="btn day-btn" data-day="6">เสาร์</button>
-                            </div>
-                            <div class="mt-4 pt-3 border-top d-flex align-items-center text-muted small">
-                                <i class="fa-solid fa-circle-info fs-5 me-2 text-primary"></i>
-                                <span>ระบบจะจดจำค่าและปรับการแสดงผลในหน้าปฏิทินอัตโนมัติ</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
+        <section id="view-system" class="view-section">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card p-4 border-0">
+                        <h5 class="fw-bold mb-4 text-primary"><i class="fa-solid fa-screwdriver-wrench me-2"></i>ตั้งค่าระบบและปฏิทิน</h5>
+                        <div class="mb-2 bg-light p-4 rounded-4 border">
+                            <label class="form-label text-dark fw-bold mb-3 fs-6">เลือกวันเริ่มต้นของสัปดาห์</label>
+                            <div class="d-flex flex-wrap gap-2" id="dayOfWeekSelector">
+                                <button class="btn day-btn" data-day="0">อาทิตย์</button>
+                                <button class="btn day-btn" data-day="1">จันทร์</button>
+                                <button class="btn day-btn" data-day="2">อังคาร</button>
+                                <button class="btn day-btn" data-day="3">พุธ</button>
+                                <button class="btn day-btn" data-day="4">พฤหัสฯ</button>
+                                <button class="btn day-btn" data-day="5">ศุกร์</button>
+                                <button class="btn day-btn" data-day="6">เสาร์</button>
+                            </div>
+                            <div class="mt-4 pt-3 border-top d-flex align-items-center text-muted small">
+                                <i class="fa-solid fa-circle-info fs-5 me-2 text-primary"></i>
+                                <span>ระบบจะจดจำค่าและปรับการแสดงผลในหน้าปฏิทินอัตโนมัติ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
 
-    <div class="modal fade" id="addEventModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered px-3">
-            <div class="modal-content">
-                <div class="modal-header border-0 pb-0 mt-3 px-4">
-                    <h5 class="fw-bold mb-0 text-gradient"><i class="fa-solid fa-calendar-plus text-primary me-2"></i>บันทึกเวร</h5>
-                    <span id="modalDateLabel" class="text-muted fs-6 ms-2 fw-bold align-self-end mb-1"></span>
-                    <button type="button" class="btn-close bg-light rounded-circle p-2" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body py-4 px-4">
-                    <label class="small text-muted fw-bold mb-3 d-block">เลือกประเภทเวร</label>
-                    <div id="modalShiftButtons" class="d-flex flex-wrap gap-2 mb-4"></div>
-                    
-                    <label class="small text-muted fw-bold mb-2 d-block">โน้ตเพิ่มเติม (ถ้ามี)</label>
-                    <textarea id="modalNote" class="form-control mb-4" rows="3" placeholder="เช่น รพ. A, เปลี่ยนเวรกับ..."></textarea>
-                    
-                    <button id="modalSaveBtn" class="btn btn-primary w-100 py-3 fw-bold rounded-pill text-uppercase tracking-wide">บันทึกข้อมูล</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="modal fade" id="addEventModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered px-3">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0 mt-3 px-4">
+                    <h5 class="fw-bold mb-0"><i class="fa-solid fa-calendar-plus text-primary me-2"></i>บันทึกเวร <span id="modalDateLabel" class="text-muted fs-6 ms-2 fw-normal"></span></h5>
+                    <button type="button" class="btn-close bg-light rounded-circle p-2" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body py-4 px-4">
+                    <label class="small text-muted fw-bold mb-3 d-block">เลือกประเภทเวร</label>
+                    <div id="modalShiftButtons" class="d-flex flex-wrap gap-2 mb-4"></div>
+                    
+                    <label class="small text-muted fw-bold mb-2 d-block">โน้ตเพิ่มเติม (ถ้ามี)</label>
+                    <textarea id="modalNote" class="form-control mb-4" rows="3" placeholder="เช่น รพ. A, เปลี่ยนเวรกับ..."></textarea>
+                    
+                    <button id="modalSaveBtn" class="btn btn-primary w-100 py-3 fw-bold rounded-pill text-uppercase tracking-wide">บันทึกข้อมูล</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-    <script type="module" src="app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script type="module" src="app.js"></script>
 
-    <script>
-        function switchView(viewId) {
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.getElementById('view-' + viewId).classList.add('active');
-            
-            if (viewId === 'calendar' && window.calendarInstance) {
-                setTimeout(() => {
-                    window.calendarInstance.updateSize();
-                }, 10);
-            }
-        }
-    </script>
+    <script>
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.getElementById('view-' + viewId).classList.add('active');
+            
+            if (viewId === 'calendar' && window.calendarInstance) {
+                setTimeout(() => {
+                    window.calendarInstance.updateSize();
+                }, 10);
+            }
+        }
+    </script>
 </body>
 </html>

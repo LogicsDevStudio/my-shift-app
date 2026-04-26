@@ -1,182 +1,189 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC6mr7_SuaFlc9R_kv8y9lc6rfKkMVv4-U",
-  authDomain: "radiologyshift.firebaseapp.com",
-  projectId: "radiologyshift",
-  storageBucket: "radiologyshift.firebasestorage.app",
-  messagingSenderId: "1085770244333",
-  appId: "1:1085770244333:web:b7e635cb2f557bc26e6ce4"
+   apiKey: "AIzaSyC6mr7_SuaFlc9R_kv8y9lc6rfKkMVv4-U",
+   authDomain: "radiologyshift.firebaseapp.com",
+   projectId: "radiologyshift",
+   storageBucket: "radiologyshift.firebasestorage.app",
+   messagingSenderId: "1085770244333",
+   appId: "1:1085770244333:web:b7e635cb2f557bc26e6ce4"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ตัวแปรเก็บข้อมูลทั้งหมด เพื่อใช้ในการคำนวณสรุปผล
-let allShiftsData = [];
-let allHolidaysData = [];
+let calendar;
+let allHolidays = [];
+let currentSelectedDate = "";
 
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', function() {
+    initSettingsView();
+    initCalendarView();
+});
+
+// --- ส่วนหน้าการจัดการประเภทเวร (Shift Settings) ---
+function initSettingsView() {
+    const toggleTime = document.getElementById('toggleTime');
+    const timeSection = document.getElementById('timeInputSection');
+    const typeName = document.getElementById('typeName');
+    const typeColor = document.getElementById('typeColor');
+    const preview = document.getElementById('previewEvent');
+    const saveTypeBtn = document.getElementById('saveTypeBtn');
+
+    // อัปเดตตัวอย่าง
+    const updatePreview = () => {
+        preview.innerText = typeName.value || "ชื่อเวร";
+        preview.style.backgroundColor = typeColor.value;
+    };
+    typeName.addEventListener('input', updatePreview);
+    typeColor.addEventListener('input', updatePreview);
+    toggleTime.addEventListener('change', () => {
+        timeSection.style.display = toggleTime.checked ? 'block' : 'none';
+    });
+
+    // บันทึกประเภทเวร
+    saveTypeBtn.addEventListener('click', async () => {
+        const data = {
+            name: typeName.value,
+            color: typeColor.value,
+            hasTime: toggleTime.checked,
+            start: toggleTime.checked ? document.getElementById('startTime').value : "",
+            end: toggleTime.checked ? document.getElementById('endTime').value : ""
+        };
+        if(!data.name) return alert("ระบุชื่อเวร");
+        
+        await addDoc(collection(db, "shiftTypes"), data);
+        typeName.value = "";
+        alert("เพิ่มประเภทเวรสำเร็จ");
+    });
+
+    // ดึงประเภทเวรมาแสดงผล (Realtime)
+    onSnapshot(collection(db, "shiftTypes"), (snapshot) => {
+        const list = document.getElementById('shiftTypeList');
+        const modalSelect = document.getElementById('modalShiftSelect');
+        list.innerHTML = "";
+        modalSelect.innerHTML = "<option value=''>-- เลือกเวร --</option>";
+        
+        snapshot.forEach(docSnap => {
+            const t = docSnap.data();
+            const id = docSnap.id;
+            
+            // ใส่ในหน้าตั้งค่า
+            const item = document.createElement('div');
+            item.className = "list-group-item d-flex justify-content-between align-items-center border-0 mb-2 shadow-sm rounded-3";
+            item.innerHTML = `<div><span class="badge" style="background:${t.color}">&nbsp;</span> <b>${t.name}</b> ${t.hasTime ? `<small>(${t.start}-${t.end})</small>` : ""}</div>
+                              <button class="btn btn-sm btn-outline-danger border-0" onclick="deleteType('${id}')">ลบ</button>`;
+            list.appendChild(item);
+
+            // ใส่ใน Modal เลือกเวร
+            const opt = document.createElement('option');
+            opt.value = id;
+            opt.dataset.name = t.name;
+            opt.dataset.color = t.color;
+            opt.dataset.time = t.hasTime ? `${t.start}-${t.end}` : "";
+            opt.innerText = t.name;
+            modalSelect.appendChild(opt);
+        });
+    });
+}
+
+// ฟังก์ชันลบประเภทเวร (ประกาศให้เรียกจาก HTML ได้)
+window.deleteType = async (id) => {
+    if(confirm("ยืนยันการลบประเภทเวรนี้?")) await deleteDoc(doc(db, "shiftTypes", id));
+};
+
+// --- ส่วนหน้าปฏิทิน (Calendar View) ---
+async function initCalendarView() {
     const calendarEl = document.getElementById('calendar');
-    
-    // ฟังก์ชันอัปเดตสรุปเวรและวันหยุดตามเดือนที่แสดงบนปฏิทิน
-    function updateSidebarInfo(currentDate) {
-        const currentMonth = currentDate.getMonth(); // 0-11
-        const currentYear = currentDate.getFullYear();
-        
-        // 1. อัปเดตชื่อเดือนในส่วนสรุป
-        const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-        document.getElementById('summaryMonthTitle').innerText = `${monthNames[currentMonth]} ${currentYear + 543}`;
-
-        // 2. คำนวณสรุปเวร
-        let cMorning = 0, cAfternoon = 0, cNight = 0, cOff = 0;
-        
-        allShiftsData.forEach(shift => {
-            const shiftDate = new Date(shift.date);
-            if(shiftDate.getMonth() === currentMonth && shiftDate.getFullYear() === currentYear) {
-                if(shift.shiftName === "เวรเช้า") cMorning++;
-                else if(shift.shiftName === "เวรบ่าย") cAfternoon++;
-                else if(shift.shiftName === "เวรดึก") cNight++;
-                else if(shift.shiftName === "ออฟ (Off)") cOff++;
-            }
-        });
-
-        document.getElementById('countMorning').innerText = cMorning;
-        document.getElementById('countAfternoon').innerText = cAfternoon;
-        document.getElementById('countNight').innerText = cNight;
-        document.getElementById('countOff').innerText = cOff;
-
-        // 3. แสดงรายชื่อวันหยุดของเดือนนั้น
-        const holidayListEl = document.getElementById('holidayList');
-        holidayListEl.innerHTML = ""; // ล้างข้อมูลเก่า
-        let hasHoliday = false;
-
-        allHolidaysData.forEach(holiday => {
-            const holDate = new Date(holiday.date);
-            if(holDate.getMonth() === currentMonth && holDate.getFullYear() === currentYear) {
-                hasHoliday = true;
-                const li = document.createElement('li');
-                li.className = "list-group-item d-flex justify-content-between align-items-center";
-                li.innerHTML = `<span>${holDate.getDate()} ${monthNames[currentMonth]}</span> <span class="badge bg-danger rounded-pill">${holiday.localName}</span>`;
-                holidayListEl.appendChild(li);
-            }
-        });
-
-        if(!hasHoliday) {
-            holidayListEl.innerHTML = `<li class="list-group-item text-muted text-center">ไม่มีวันหยุดราชการในเดือนนี้</li>`;
-        }
-    }
-
-    // สร้างปฏิทิน
-    const calendar = new FullCalendar.Calendar(calendarEl, {
+    calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'th',
-        height: 'auto',
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,listMonth'
+        headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,listMonth' },
+        dateClick: function(info) {
+            currentSelectedDate = info.dateStr;
+            document.getElementById('modalDateLabel').innerText = info.dateStr;
+            new bootstrap.Modal(document.getElementById('addEventModal')).show();
         },
-        datesSet: function(info) {
-            // เมื่อผู้ใช้เปลี่ยนเดือน ให้คำนวณข้อมูลใหม่
-            updateSidebarInfo(info.view.currentStart);
-        },
-        events: async function(info, successCallback, failureCallback) {
+        datesSet: (info) => updateSidebarSummary(info.view.currentStart),
+        events: async function(info, successCallback) {
+            // โหลดวันหยุด
             try {
-                let calendarEvents = [];
-                
-                // โหลดวันหยุด (ทำครั้งเดียวหรือตามปี)
-                // 1. โหลดวันหยุด (ปรับปรุงเพื่อป้องกัน Error ค่าว่าง)
-                try {
-                    const year = new Date().getFullYear();
-                    const holidayRes = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/TH`);
-                    
-                    if (holidayRes.ok && holidayRes.status !== 204) {
-                        const holidayText = await holidayRes.text(); // อ่านเป็นข้อความดิบก่อน
-                        
-                        if (holidayText && holidayText.trim().length > 0) { // เช็คว่ามีข้อมูลจริงๆ ไหม
-                            allHolidaysData = JSON.parse(holidayText); // ค่อยแปลงเป็น JSON
-                            const holidayEvents = allHolidaysData.map(h => ({
-                                title: h.localName,
-                                start: h.date,
-                                display: 'background',
-                                color: '#ffe6e6'
-                            }));
-                            calendarEvents = calendarEvents.concat(holidayEvents);
-                        } else {
-                            console.warn(`API ไม่มีข้อมูลวันหยุดสำหรับปี ${year}`);
-                        }
-                    } else {
-                        console.warn("ไม่สามารถติดต่อ API วันหยุดได้ หรือไม่มีข้อมูล (Status: " + holidayRes.status + ")");
-                    }
-                } catch (e) { 
-                    console.error("ระบบวันหยุดขัดข้อง แต่ระบบเวรจะยังทำงานต่อ:", e); 
+                const year = new Date().getFullYear();
+                const res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/TH`);
+                if(res.ok) {
+                    allHolidays = await res.json();
+                    const holEvents = allHolidays.map(h => ({ start: h.date, display: 'background', color: '#ffcccc' }));
+                    successCallback(holEvents);
                 }
+            } catch(e) {}
 
-                // โหลดเวรจาก Firebase
-                const querySnapshot = await getDocs(collection(db, "shifts"));
-                allShiftsData = querySnapshot.docs.map(doc => doc.data());
-                
-                const shiftEvents = allShiftsData.map(data => ({
-                    title: data.shiftName,
-                    start: data.date,
-                    backgroundColor: data.bgColor,
-                    extendedProps: { time: data.time }
-                }));
-                
-                calendarEvents = calendarEvents.concat(shiftEvents);
-                
-                // ส่งข้อมูลให้ปฏิทินแสดงผล
-                successCallback(calendarEvents);
-                
-                // อัปเดตข้อมูลด้านข้างทันทีที่โหลดข้อมูลครั้งแรกเสร็จ
-                updateSidebarInfo(calendar.getDate());
-
-            } catch (error) {
-                console.error(error);
-                failureCallback(error);
-            }
+            // โหลดเวร
+            const snap = await getDocs(collection(db, "shifts"));
+            const shifts = snap.docs.map(d => ({
+                id: d.id,
+                title: d.data().name,
+                start: d.data().date,
+                backgroundColor: d.data().color,
+                extendedProps: { shiftId: d.id }
+            }));
+            successCallback(shifts);
         },
-        eventClick: function(info) {
-            if (info.event.extendedProps.time && info.event.extendedProps.time !== "-") {
-                alert(info.event.title + "\nเวลา: " + info.event.extendedProps.time);
-            } else {
-                alert(info.event.title);
+        eventClick: async function(info) {
+            if(info.event.display === 'background') return;
+            if(confirm(`ลบเวร ${info.event.title} ออกจากปฏิทิน?`)) {
+                await deleteDoc(doc(db, "shifts", info.event.extendedProps.shiftId));
+                calendar.refetchEvents();
             }
         }
     });
-
     calendar.render();
+}
 
-    // ฟังก์ชันบันทึกเวร
-    const saveBtn = document.getElementById('saveBtn');
-    saveBtn.addEventListener('click', async () => {
-        const date = document.getElementById('dateInput').value;
-        const shiftSelect = document.getElementById('shiftInput');
-        const shiftName = shiftSelect.value;
-        const shiftTime = shiftSelect.options[shiftSelect.selectedIndex].dataset.time;
-        const shiftColor = shiftSelect.options[shiftSelect.selectedIndex].dataset.color;
+// บันทึกเวรลงวันที่คลิก
+document.getElementById('modalSaveBtn').addEventListener('click', async () => {
+    const select = document.getElementById('modalShiftSelect');
+    const opt = select.options[select.selectedIndex];
+    if(!opt.value) return;
 
-        if (!date) return alert("กรุณาเลือกวันที่ก่อนบันทึกครับ");
-
-        saveBtn.innerText = "⏳ กำลังบันทึก...";
-        saveBtn.disabled = true;
-
-        try {
-            await addDoc(collection(db, "shifts"), {
-                date: date,
-                shiftName: shiftName,
-                time: shiftTime,
-                bgColor: shiftColor
-            });
-            alert("✅ บันทึกข้อมูลสำเร็จ!");
-            calendar.refetchEvents(); // สั่งให้ปฏิทินและกล่องสรุปดึงข้อมูลใหม่
-        } catch (e) {
-            alert("❌ เกิดข้อผิดพลาด: " + e);
-        }
-
-        saveBtn.innerText = "บันทึกข้อมูล";
-        saveBtn.disabled = false;
+    await addDoc(collection(db, "shifts"), {
+        date: currentSelectedDate,
+        name: opt.dataset.name,
+        color: opt.dataset.color,
+        time: opt.dataset.time
     });
+    bootstrap.Modal.getInstance(document.getElementById('addEventModal')).hide();
+    calendar.refetchEvents();
 });
+
+// สรุปข้อมูลข้างปฏิทิน
+async function updateSidebarSummary(startDate) {
+    const m = startDate.getMonth();
+    const y = startDate.getFullYear();
+    const snap = await getDocs(collection(db, "shifts"));
+    const summary = {};
+    
+    snap.forEach(d => {
+        const data = d.data();
+        const dDate = new Date(data.date);
+        if(dDate.getMonth() === m && dDate.getFullYear() === y) {
+            summary[data.name] = (summary[data.name] || 0) + 1;
+        }
+    });
+
+    const sumBox = document.getElementById('summaryList');
+    sumBox.innerHTML = "";
+    Object.keys(summary).forEach(key => {
+        sumBox.innerHTML += `<div class="d-flex justify-content-between mb-2"><span>${key}</span> <b>${summary[key]} ครั้ง</b></div>`;
+    });
+
+    // อัปเดตวันหยุด
+    const holBox = document.getElementById('holidayList');
+    holBox.innerHTML = "";
+    allHolidays.forEach(h => {
+        const hDate = new Date(h.date);
+        if(hDate.getMonth() === m && hDate.getFullYear() === y) {
+            holBox.innerHTML += `<li class="list-group-item small d-flex justify-content-between"><span>${hDate.getDate()} - ${h.localName}</span></li>`;
+        }
+    });
+}

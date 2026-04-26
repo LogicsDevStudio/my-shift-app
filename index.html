@@ -34,6 +34,17 @@
         </div>
     </nav>
 
+    <div id="fastAddBar" class="fixed-bottom bg-white shadow-lg border-top p-3 d-none" style="z-index: 1050;">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <h6 class="mb-0 fw-bold">🚀 โหมดลงเวรด่วน: <span id="fastAddDateLabel" class="text-primary"></span></h6>
+                <button class="btn btn-sm btn-outline-secondary" onclick="toggleFastAdd(false)">ปิดโหมดนี้</button>
+            </div>
+            <div id="fastAddButtons" class="d-flex gap-2 overflow-auto pb-2">
+                </div>
+        </div>
+    </div>
+
     <div class="offcanvas offcanvas-top h-100" tabindex="-1" id="fullScreenMenu">
         <div class="offcanvas-header container mt-2">
             <h5 class="offcanvas-title fw-bold">เมนูหลัก</h5>
@@ -71,9 +82,16 @@
         </div>
     </div>
 
-    <div class="container mt-4">
+    <div class="container mt-4 mb-5">
         
         <section id="view-calendar" class="view-section active">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold mb-0">ปฏิทินปฏิบัติงาน</h4>
+                <button class="btn btn-success rounded-pill fw-bold" onclick="toggleFastAdd(true)">
+                    <i class="fa-solid fa-bolt me-2"></i> ระบุเวรแบบรวดเร็ว
+                </button>
+            </div>
+
             <div class="row g-4">
                 <div class="col-lg-9">
                     <div class="calendar-card">
@@ -152,9 +170,13 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body py-4">
-                    <select id="modalShiftSelect" class="form-select mb-3">
-                        </select>
-                    <button id="modalSaveBtn" class="btn btn-primary w-100 py-2 fw-bold">ตกลง</button>
+                    <label class="small fw-bold mb-1">เลือกประเภทเวร</label>
+                    <select id="modalShiftSelect" class="form-select mb-3"></select>
+                    
+                    <label class="small fw-bold mb-1">โน้ตเพิ่มเติม (ถ้ามี)</label>
+                    <textarea id="modalNote" class="form-control mb-3" rows="2" placeholder="เช่น รพ. A, เคสพิเศษ..."></textarea>
+                    
+                    <button id="modalSaveBtn" class="btn btn-primary w-100 py-2 fw-bold">บันทึกข้อมูล</button>
                 </div>
             </div>
         </div>

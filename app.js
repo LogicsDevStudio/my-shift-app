@@ -2,13 +2,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
 import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 const firebaseConfig = {
-    // *** นำ Config ของคุณมาใส่ตรงนี้ ***
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyC6mr7_SuaFlc9R_kv8y9lc6rfKkMVv4-U",
+  authDomain: "radiologyshift.firebaseapp.com",
+  projectId: "radiologyshift",
+  storageBucket: "radiologyshift.firebasestorage.app",
+  messagingSenderId: "1085770244333",
+  appId: "1:1085770244333:web:b7e635cb2f557bc26e6ce4"
 };
 
 const app = initializeApp(firebaseConfig);

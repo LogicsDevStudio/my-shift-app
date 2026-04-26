@@ -12,323 +12,674 @@
 
     <style>
         :root {
-            --primary-color: #6366f1; /* Vibrant Indigo */
-            --primary-hover: #4f46e5;
-            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-            --accent-color: #f43f5e;  /* Bright Rose */
-            --bg-color: #f4f6f9;
-            --surface-color: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --radius-md: 16px;
-            --radius-lg: 24px;
-            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            --shadow-soft: 0 15px 35px -5px rgba(99, 102, 241, 0.08);
-            --shadow-hover: 0 20px 40px -10px rgba(99, 102, 241, 0.2);
+            --primary:        #6366f1;
+            --primary-dark:   #4338ca;
+            --primary-light:  #818cf8;
+            --accent:         #f43f5e;
+            --accent-dark:    #be123c;
+            --success:        #10b981;
+            --warning:        #f59e0b;
+
+            --grad-primary:   linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+            --grad-accent:    linear-gradient(135deg, #f43f5e 0%, #fb923c 100%);
+            --grad-success:   linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+            --grad-warm:      linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+            --grad-hero:      linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            --grad-card-top:  linear-gradient(180deg, rgba(99,102,241,0.06) 0%, rgba(255,255,255,0) 100%);
+
+            --bg:             #f0f2ff;
+            --surface:        #ffffff;
+            --surface-2:      #f8faff;
+            --border:         #e2e8f0;
+            --border-soft:    rgba(99,102,241,0.12);
+
+            --text:           #1e1b4b;
+            --text-muted:     #64748b;
+            --text-light:     #94a3b8;
+
+            --radius-sm:      10px;
+            --radius-md:      16px;
+            --radius-lg:      24px;
+            --radius-xl:      32px;
+
+            --shadow-xs:      0 1px 3px rgba(0,0,0,0.06);
+            --shadow-sm:      0 4px 12px rgba(99,102,241,0.08);
+            --shadow-md:      0 8px 30px rgba(99,102,241,0.12);
+            --shadow-lg:      0 20px 50px rgba(99,102,241,0.18);
+            --shadow-card:    0 2px 8px rgba(0,0,0,0.04), 0 12px 32px rgba(99,102,241,0.08);
         }
 
+        /* ─── Base ─────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; }
         body { 
             font-family: 'Prompt', sans-serif; 
-            background-color: var(--bg-color); 
-            color: var(--text-main); 
+            background: var(--bg);
+            background-image:
+                radial-gradient(ellipse 800px 600px at 80% -10%, rgba(99,102,241,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 600px 500px at -10% 60%, rgba(139,92,246,0.06) 0%, transparent 60%);
+            background-attachment: fixed;
+            color: var(--text); 
             -webkit-font-smoothing: antialiased;
-            letter-spacing: 0.2px;
+            min-height: 100vh;
         }
 
-        /* Navbar - Glassmorphism */
-        .navbar { 
-            background-color: rgba(255, 255, 255, 0.85); 
-            backdrop-filter: blur(12px) saturate(180%);
-            -webkit-backdrop-filter: blur(12px) saturate(180%);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3); 
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+        /* ─── Navbar ─────────────────────────────── */
+        .navbar {
+            background: rgba(255,255,255,0.75);
+            backdrop-filter: blur(20px) saturate(200%);
+            -webkit-backdrop-filter: blur(20px) saturate(200%);
+            border-bottom: 1px solid rgba(255,255,255,0.6);
+            box-shadow: 0 1px 0 rgba(99,102,241,0.08), 0 4px 24px rgba(0,0,0,0.04);
         }
         .navbar-brand { 
-            color: var(--primary-color) !important; 
-            letter-spacing: -0.5px; 
-            font-size: 1.3rem;
+            color: var(--primary) !important;
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -0.5px;
+            background: var(--grad-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .navbar-brand i {
+            -webkit-text-fill-color: var(--primary);
+        }
+        .btn-menu {
+            background: var(--surface) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 50px !important;
+            padding: 0.5rem 1.25rem !important;
+            font-weight: 500 !important;
+            font-size: 0.9rem !important;
+            color: var(--text) !important;
+            box-shadow: var(--shadow-xs) !important;
+            transition: all 0.25s ease !important;
+        }
+        .btn-menu:hover {
+            border-color: var(--primary) !important;
+            color: var(--primary) !important;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.12) !important;
+            transform: none !important;
+        }
+        .btn-menu i { color: var(--primary); }
+
+        /* ─── Typography ────────────────────────── */
+        h4, h5, h6 { font-weight: 700; color: var(--text); }
+        .text-primary { color: var(--primary) !important; }
+        .text-danger { color: var(--accent) !important; }
+        .text-muted { color: var(--text-muted) !important; }
+
+        /* ─── Section Headings ──────────────────── */
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title .icon-pill {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: var(--grad-primary);
+            display: inline-flex; align-items: center; justify-content: center;
+            color: white;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(99,102,241,0.35);
+        }
+        .section-title .icon-pill.danger {
+            background: var(--grad-accent);
+            box-shadow: 0 4px 12px rgba(244,63,94,0.35);
         }
 
-        /* Typography & Forms */
-        h4, h5, h6 { font-weight: 600; color: var(--text-main); }
-        .text-primary { color: var(--primary-color) !important; }
-        .text-danger { color: var(--accent-color) !important; }
-        .text-muted { color: var(--text-muted) !important; }
-        
+        /* ─── Forms ────────────────────────────── */
+        .form-label { font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
         .form-control {
-            border-radius: 12px;
-            border: 1px solid transparent;
-            padding: 0.8rem 1.2rem;
-            background-color: #f1f5f9;
-            transition: all 0.3s ease;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border);
+            padding: 0.75rem 1.1rem;
+            background: var(--surface-2);
+            transition: all 0.25s ease;
             box-shadow: none !important;
             font-size: 0.95rem;
+            color: var(--text);
         }
         .form-control:focus {
-            background-color: var(--surface-color);
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15) !important;
+            background: var(--surface);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99,102,241,0.12) !important;
         }
+        .form-control::placeholder { color: var(--text-light); }
 
-        /* Buttons */
+        /* ─── Buttons ───────────────────────────── */
         .btn { 
-            border-radius: 12px; 
-            font-weight: 500; 
+            border-radius: var(--radius-sm); 
+            font-weight: 600; 
             padding: 0.7rem 1.5rem; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-            box-shadow: none !important; 
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1); 
+            box-shadow: none !important;
+            letter-spacing: 0.2px;
         }
         .btn-primary { 
-            background: var(--primary-gradient); 
+            background: var(--grad-primary); 
             border: none; 
             color: white;
+            box-shadow: 0 4px 15px rgba(99,102,241,0.4) !important;
         }
         .btn-primary:hover { 
             transform: translateY(-2px); 
-            box-shadow: var(--shadow-hover) !important; 
+            box-shadow: 0 8px 25px rgba(99,102,241,0.45) !important; 
+            filter: brightness(1.05);
         }
-        .btn-success { background-color: #10b981; border-color: #10b981; }
-        .btn-success:hover { background-color: #059669; border-color: #059669; transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.3) !important; }
-        .btn-danger { background-color: var(--accent-color); border: none; }
-        .btn-light { background-color: var(--surface-color); border: 1px solid var(--border-color); color: var(--text-main); }
-        .btn-light:hover { background-color: #f8fafc; border-color: #cbd5e1; }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-success { 
+            background: var(--grad-success); 
+            border: none; 
+            color: white;
+            box-shadow: 0 4px 15px rgba(16,185,129,0.35) !important;
+        }
+        .btn-success:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 25px rgba(16,185,129,0.4) !important; 
+        }
+        .btn-danger { 
+            background: var(--grad-accent); 
+            border: none; 
+            color: white;
+            box-shadow: 0 4px 15px rgba(244,63,94,0.35) !important;
+        }
+        .btn-light { 
+            background: var(--surface); 
+            border: 1.5px solid var(--border); 
+            color: var(--text-muted); 
+        }
+        .btn-light:hover { 
+            background: var(--surface-2); 
+            border-color: #cbd5e1; 
+            color: var(--text); 
+        }
+        .btn-outline-primary {
+            border: 1.5px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
+        }
+        .btn-outline-primary:hover {
+            background: rgba(99,102,241,0.06);
+        }
 
-        /* Cards & Layout */
-        .card, .calendar-card { 
-            background: var(--surface-color); 
-            border: none !important; 
-            border-radius: var(--radius-lg); 
-            box-shadow: var(--shadow-soft) !important; 
+        /* ─── Cards ──────────────────────────────── */
+        .card {
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.8) !important;
+            border-radius: var(--radius-lg) !important;
+            box-shadow: var(--shadow-card) !important;
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: var(--grad-card-top);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .card > * { position: relative; z-index: 1; }
+
+        .calendar-card {
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.8);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            box-shadow: var(--shadow-card);
+        }
+
+        /* ─── Summary Cards ──────────────────────── */
+        .summary-card {
+            background: var(--surface);
+            border: 1px solid var(--border-soft) !important;
+            border-radius: var(--radius-lg) !important;
+            box-shadow: var(--shadow-sm) !important;
             overflow: hidden;
         }
-        .calendar-card { padding: 24px; }
-        
-        .summary-card { 
-            border-radius: var(--radius-lg); 
-            box-shadow: var(--shadow-sm) !important; 
-            border: 1px solid var(--border-color) !important; 
-            background: var(--surface-color); 
-        }
-        .summary-card .card-header { 
-            background: rgba(248, 250, 252, 0.5); 
-            border-bottom: 1px solid var(--border-color); 
+        .summary-card .card-header {
+            background: linear-gradient(to right, rgba(99,102,241,0.04), rgba(139,92,246,0.04));
+            border-bottom: 1px solid var(--border-soft);
+            padding: 1rem 1.25rem;
         }
 
-        /* FullCalendar Minimal Overrides */
-        .fc-theme-standard td, .fc-theme-standard th { border-color: #f1f5f9; }
-        .fc .fc-toolbar-title { font-weight: 700; color: var(--text-main); font-size: 1.3rem; letter-spacing: -0.5px; }
-        .fc .fc-button-primary { 
-            background-color: var(--surface-color); 
-            color: var(--text-main); 
-            border: 1px solid var(--border-color); 
-            text-transform: capitalize; 
-            border-radius: 10px;
-            font-weight: 500;
-            padding: 0.4rem 1rem;
-        }
-        .fc .fc-button-primary:hover { background-color: #f8fafc; color: var(--primary-color); border-color: var(--primary-color); }
-        .fc .fc-button-active { background-color: var(--primary-color) !important; color: white !important; border-color: var(--primary-color) !important; }
-        .fc-event { border: none !important; padding: 4px 8px; font-weight: 500; border-radius: 6px; font-size: 0.8rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        
-        /* Menu Cards (Offcanvas) */
-        .menu-card { 
-            background-color: var(--surface-color);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-            border-radius: var(--radius-md); 
-            border: 1px solid var(--border-color) !important; 
-            cursor: pointer; 
-            box-shadow: var(--shadow-sm) !important;
-            padding: 24px 16px;
-        }
-        .menu-card:hover { 
-            transform: translateY(-5px); 
-            border-color: var(--primary-color) !important; 
-            box-shadow: var(--shadow-hover) !important; 
-            background: linear-gradient(to bottom, #ffffff, #f8fafc);
-        }
-        .menu-icon { 
-            font-size: 1.5rem; 
-            width: 56px;
-            height: 56px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #f1f5f9;
-            border-radius: 16px;
-            color: var(--primary-color); 
-            margin-bottom: 16px; 
-            transition: all 0.3s ease; 
-        }
-        .menu-card:hover .menu-icon { 
-            background-color: var(--primary-color);
-            color: white !important;
-            transform: scale(1.1) rotate(5deg); 
-            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
-        }
-        .menu-card:active { transform: scale(0.96); }
-
-        /* Icon Colors Specific */
-        .menu-card:nth-child(2):hover .menu-icon { background-color: #f59e0b; box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3); }
-        .menu-card:nth-child(4):hover .menu-icon { background-color: #10b981; box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3); }
-        .menu-card:nth-child(2) .menu-icon { color: #f59e0b; }
-        .menu-card:nth-child(4) .menu-icon { color: #10b981; }
-
-        /* Utilities */
-        .view-section { display: none; animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-        .view-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .preview-event { padding: 8px 16px; border-radius: 8px; display: inline-block; font-weight: 500; margin-top: 10px; box-shadow: var(--shadow-sm); }
-        .list-group-item { border-color: var(--border-color); padding: 16px; transition: background 0.2s; }
-        .list-group-item:hover { background-color: #f8fafc; }
-        
-        /* Day Buttons */
-        .day-btn { flex: 1; border-radius: 12px; font-weight: 500; transition: all 0.2s; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--text-muted); }
-        .day-btn:hover { background: #f8fafc; color: var(--text-main); border-color: #cbd5e1; }
-        .day-btn.active { background: var(--primary-gradient); color: white; border: none; box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3); }
-        
-        .holiday-event { pointer-events: none; opacity: 0.85; font-size: 0.75rem; background: transparent !important; color: var(--text-muted) !important; border-left: 3px solid var(--accent-color) !important; border-radius: 0; padding-left: 8px; }
-
-        /* Floating Fast Add Bar */
-        #fastAddBar { 
-            background: rgba(255, 255, 255, 0.85); 
-            backdrop-filter: blur(16px) saturate(180%); 
-            border-top: 1px solid rgba(255, 255, 255, 0.4) !important; 
-            box-shadow: 0 -15px 40px rgba(0,0,0,0.06) !important; 
-            border-radius: 24px 24px 0 0;
-        }
-
-        /* Modal Enhancements */
-        .modal-content {
-            border-radius: var(--radius-lg);
-            border: 1px solid rgba(255,255,255,0.4);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-
-        /* Today Alert Pill */
+        /* ─── Today Status ───────────────────────── */
         #todayStatusHighlight {
             border-radius: 50px !important;
-            border: 1px solid rgba(99, 102, 241, 0.2) !important;
-            background: linear-gradient(to right, #ffffff, #f8fafc) !important;
-            box-shadow: var(--shadow-sm);
-            padding: 12px 24px;
+            background: linear-gradient(135deg, rgba(99,102,241,0.06) 0%, rgba(139,92,246,0.04) 100%) !important;
+            border: 1.5px solid rgba(99,102,241,0.15) !important;
+            box-shadow: none;
+            padding: 14px 24px !important;
         }
 
+        /* ─── Offcanvas Menu ─────────────────────── */
+        .offcanvas {
+            background: linear-gradient(160deg, #0f0c29 0%, #302b63 50%, #24243e 100%) !important;
+        }
+        .offcanvas-header { border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .offcanvas-title { color: white !important; }
+        .offcanvas-title i { color: rgba(255,255,255,0.7) !important; }
+        .offcanvas .btn-close {
+            background-color: rgba(255,255,255,0.15) !important;
+            border-radius: 50% !important;
+            filter: invert(1) brightness(2) !important;
+            opacity: 0.8;
+        }
+
+        /* ─── Menu Cards ─────────────────────────── */
+        .menu-card {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid rgba(255,255,255,0.12) !important;
+            border-radius: var(--radius-md) !important;
+            box-shadow: none !important;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            padding: 28px 16px;
+            text-align: center;
+            color: white;
+            backdrop-filter: blur(8px);
+        }
+        .menu-card:hover {
+            background: rgba(255,255,255,0.14) !important;
+            border-color: rgba(255,255,255,0.3) !important;
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3) !important;
+        }
+        .menu-card:active { transform: scale(0.96) translateY(0); }
+        .menu-card h6 { color: rgba(255,255,255,0.9) !important; font-size: 0.85rem; margin-top: 4px; }
+
+        .menu-icon {
+            font-size: 1.4rem;
+            width: 60px; height: 60px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 18px;
+            margin-bottom: 14px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* Menu card icon variants */
+        .menu-card:nth-child(1) .menu-icon { background: linear-gradient(135deg, #6366f1, #8b5cf6); box-shadow: 0 8px 20px rgba(99,102,241,0.5); color: white; }
+        .menu-card:nth-child(2) .menu-icon { background: linear-gradient(135deg, #f59e0b, #f97316); box-shadow: 0 8px 20px rgba(245,158,11,0.5); color: white; }
+        .menu-card:nth-child(3) .menu-icon { background: linear-gradient(135deg, #06b6d4, #0ea5e9); box-shadow: 0 8px 20px rgba(6,182,212,0.5); color: white; }
+        .menu-card:nth-child(4) .menu-icon { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 8px 20px rgba(16,185,129,0.5); color: white; }
+        .menu-card:nth-child(5) .menu-icon { background: linear-gradient(135deg, #8b5cf6, #a78bfa); box-shadow: 0 8px 20px rgba(139,92,246,0.5); color: white; }
+        .menu-card:nth-child(6) .menu-icon { background: linear-gradient(135deg, #ec4899, #f43f5e); box-shadow: 0 8px 20px rgba(244,63,94,0.5); color: white; }
+        .menu-card:nth-child(7) .menu-icon { background: linear-gradient(135deg, #64748b, #475569); box-shadow: 0 8px 20px rgba(100,116,139,0.5); color: white; }
+        .menu-card:nth-child(8) .menu-icon { background: linear-gradient(135deg, #14b8a6, #0d9488); box-shadow: 0 8px 20px rgba(20,184,166,0.5); color: white; }
+
+        .menu-card:hover .menu-icon { transform: scale(1.12) rotate(6deg); }
+
+        /* ─── FullCalendar ───────────────────────── */
+        .fc-theme-standard td, .fc-theme-standard th { border-color: rgba(99,102,241,0.08); }
+        .fc .fc-toolbar-title { 
+            font-weight: 700; 
+            color: var(--text); 
+            font-size: 1.2rem; 
+            letter-spacing: -0.5px;
+        }
+        .fc .fc-button-primary { 
+            background: var(--surface-2);
+            color: var(--text-muted); 
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm) !important;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 0.45rem 1rem;
+            box-shadow: var(--shadow-xs);
+            transition: all 0.2s ease;
+        }
+        .fc .fc-button-primary:not(:disabled):hover { 
+            background: var(--surface); 
+            color: var(--primary); 
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+        }
+        .fc .fc-button-active, 
+        .fc .fc-button-primary:not(:disabled).fc-button-active { 
+            background: var(--grad-primary) !important; 
+            color: white !important; 
+            border-color: transparent !important;
+            box-shadow: 0 4px 12px rgba(99,102,241,0.4) !important;
+        }
+        .fc-event { 
+            border: none !important; 
+            padding: 3px 8px; 
+            font-weight: 600; 
+            border-radius: 8px !important; 
+            font-size: 0.78rem; 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            transition: transform 0.15s ease;
+        }
+        .fc-event:hover { transform: scale(1.03); }
+        .fc .fc-daygrid-day-number { 
+            font-weight: 600; 
+            color: var(--text-muted); 
+            font-size: 0.85rem;
+        }
+        .fc .fc-day-today { background: rgba(99,102,241,0.05) !important; }
+        .fc .fc-day-today .fc-daygrid-day-number {
+            background: var(--grad-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+        .fc .fc-col-header-cell-cushion { 
+            font-weight: 700; 
+            font-size: 0.78rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        /* ─── View Transitions ───────────────────── */
+        .view-section { display: none; animation: fadeUp 0.45s cubic-bezier(0.4,0,0.2,1); }
+        .view-section.active { display: block; }
+        @keyframes fadeUp { 
+            from { opacity: 0; transform: translateY(16px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        /* ─── Fast Add Bar ───────────────────────── */
+        #fastAddBar {
+            background: rgba(15,12,41,0.92);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-top: 1px solid rgba(255,255,255,0.1) !important;
+            box-shadow: 0 -20px 60px rgba(0,0,0,0.25) !important;
+            border-radius: 28px 28px 0 0;
+        }
+        #fastAddBar h6 { color: rgba(255,255,255,0.9); }
+        #fastAddBar .btn-light {
+            background: rgba(255,255,255,0.1) !important;
+            border: 1px solid rgba(255,255,255,0.15) !important;
+            color: rgba(255,255,255,0.7) !important;
+            border-radius: 50px !important;
+        }
+        #fastAddBar .btn-light:hover {
+            background: rgba(255,255,255,0.18) !important;
+            color: white !important;
+        }
+
+        /* ─── Modal ──────────────────────────────── */
+        .modal-content {
+            border-radius: var(--radius-lg) !important;
+            border: 1px solid rgba(255,255,255,0.6) !important;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.2), 0 0 0 1px rgba(99,102,241,0.1);
+            backdrop-filter: blur(20px);
+        }
+        .modal-header { background: linear-gradient(to right, rgba(99,102,241,0.04), rgba(139,92,246,0.03)); }
+        .modal-content .btn-close {
+            background-color: #f1f5f9 !important;
+            border-radius: 50% !important;
+            padding: 0.5rem !important;
+            opacity: 1 !important;
+        }
+
+        /* ─── List Group ─────────────────────────── */
+        .list-group-item { 
+            border-color: var(--border-soft) !important; 
+            padding: 14px 16px; 
+            transition: background 0.2s; 
+            background: transparent;
+            color: var(--text);
+        }
+        .list-group-item:hover { background: var(--surface-2); }
+        .list-group-item:first-child { border-radius: var(--radius-sm) var(--radius-sm) 0 0 !important; }
+        .list-group-item:last-child { border-radius: 0 0 var(--radius-sm) var(--radius-sm) !important; }
+
+        /* ─── Day Buttons ────────────────────────── */
+        .day-btn { 
+            flex: 1; 
+            border-radius: var(--radius-sm) !important; 
+            font-weight: 600; 
+            font-size: 0.82rem;
+            transition: all 0.2s ease; 
+            border: 1.5px solid var(--border) !important; 
+            background: var(--surface-2) !important; 
+            color: var(--text-muted) !important; 
+            padding: 0.6rem 0.5rem !important;
+        }
+        .day-btn:hover { 
+            background: var(--surface) !important; 
+            color: var(--primary) !important; 
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.1) !important;
+        }
+        .day-btn.active { 
+            background: var(--grad-primary) !important; 
+            color: white !important; 
+            border-color: transparent !important; 
+            box-shadow: 0 4px 14px rgba(99,102,241,0.4) !important; 
+        }
+
+        /* ─── Preview Event ──────────────────────── */
+        .preview-event { 
+            padding: 8px 20px; 
+            border-radius: 10px; 
+            display: inline-block; 
+            font-weight: 600; 
+            font-size: 0.85rem;
+            margin-top: 10px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            letter-spacing: 0.2px;
+        }
+
+        /* ─── Holiday Event ──────────────────────── */
+        .holiday-event { 
+            pointer-events: none; 
+            opacity: 0.8; 
+            font-size: 0.72rem; 
+            background: transparent !important; 
+            color: var(--accent) !important; 
+            border-left: 3px solid var(--accent) !important; 
+            border-radius: 0 4px 4px 0 !important; 
+            padding-left: 8px; 
+        }
+
+        /* ─── Form Switch ─────────────────────────── */
+        .form-check-input:checked { 
+            background-color: var(--primary); 
+            border-color: var(--primary); 
+        }
+        .form-check-input:focus { 
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.2) !important; 
+            border-color: var(--primary);
+        }
+
+        /* ─── Settings Inline Note ─────────────────── */
+        .info-note {
+            background: linear-gradient(135deg, rgba(99,102,241,0.06) 0%, rgba(139,92,246,0.04) 100%);
+            border: 1px solid rgba(99,102,241,0.12);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+        .info-note i { color: var(--primary); }
+
+        /* ─── Color Picker ─────────────────────────── */
+        .form-control-color {
+            width: 100% !important;
+            height: 52px !important;
+            padding: 4px !important;
+            border-radius: var(--radius-sm) !important;
+            cursor: pointer;
+        }
+
+        /* ─── Shift Type List ────────────────────── */
+        #shiftTypeList .list-group-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .shift-color-dot {
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        /* ─── Scrollbar ──────────────────────────── */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.2); border-radius: 99px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.4); }
+
+        /* ─── Print ──────────────────────────────── */
         @media print {
             .navbar, .offcanvas, .btn, #fastAddBar, .summary-card { display: none !important; }
             .calendar-card { box-shadow: none !important; border: none !important; padding: 0 !important; }
             body { background: white; }
         }
+
+        /* ─── Responsive Tweaks ─────────────────── */
+        @media (max-width: 768px) {
+            .calendar-card { padding: 16px; }
+            .navbar-brand { font-size: 1.1rem; }
+        }
     </style>
 </head>
 <body>
 
+    <!-- ═══ NAVBAR ══════════════════════════════════════════════════════ -->
     <nav class="navbar sticky-top">
         <div class="container d-flex align-items-center">
-            <button class="btn btn-light rounded-pill px-4 py-2 border-0 shadow-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#fullScreenMenu">
-                <i class="fa-solid fa-bars me-2 text-primary"></i> <span class="fw-medium">เมนู</span>
+            <button class="btn btn-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#fullScreenMenu">
+                <i class="fa-solid fa-bars me-2"></i> <span>เมนู</span>
             </button>
-            <span class="navbar-brand fw-bold mx-auto"><i class="fa-solid fa-notes-medical me-2"></i>Radiology Shift Pro</span>
-            <div style="width: 95px;"></div> 
+            <span class="navbar-brand fw-bold mx-auto">
+                <i class="fa-solid fa-notes-medical me-2"></i>Radiology Shift Pro
+            </span>
+            <div style="width: 95px;"></div>
         </div>
     </nav>
 
+    <!-- ═══ FAST ADD BAR ════════════════════════════════════════════════ -->
     <div id="fastAddBar" class="fixed-bottom p-3 d-none" style="z-index: 1050;">
         <div class="container">
             <div class="d-flex align-items-center justify-content-between mb-3">
-                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-bolt text-warning me-2 fs-5"></i> โหมดลงเวรด่วน: <span id="fastAddDateLabel" class="text-primary ms-1"></span></h6>
-                <button class="btn btn-sm btn-light text-muted border-0 rounded-pill px-4" onclick="toggleFastAdd(false)">ปิดโหมดนี้</button>
+                <h6 class="mb-0 fw-bold">
+                    <i class="fa-solid fa-bolt text-warning me-2 fs-5"></i>
+                    โหมดลงเวรด่วน: <span id="fastAddDateLabel" class="ms-1" style="color: var(--primary-light);"></span>
+                </h6>
+                <button class="btn btn-sm btn-light" onclick="toggleFastAdd(false)">ปิดโหมดนี้</button>
             </div>
-            <div id="fastAddButtons" class="d-flex gap-2 overflow-auto pb-2 custom-scrollbar"></div>
+            <div id="fastAddButtons" class="d-flex gap-2 overflow-auto pb-2"></div>
         </div>
     </div>
 
+    <!-- ═══ FAST ADD DATE MODAL ══════════════════════════════════════════ -->
     <div class="modal fade" id="fastAddDateModal" tabindex="-1">
         <div class="modal-dialog modal-sm modal-dialog-centered">
             <div class="modal-content border-0">
-                <div class="modal-header border-0 pb-0 mt-2">
-                    <h6 class="fw-bold mb-0">เลือกวันเริ่มต้นลงเวร</h6>
+                <div class="modal-header border-0 pb-0 mt-2 px-4">
+                    <h6 class="fw-bold mb-0">
+                        <i class="fa-solid fa-calendar-day text-primary me-2"></i>เลือกวันเริ่มต้นลงเวร
+                    </h6>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body py-4 text-center px-4">
                     <input type="date" id="fastAddStartDate" class="form-control mb-4 text-center fw-medium">
-                    <button class="btn btn-primary w-100 py-2 fw-bold rounded-pill" onclick="startFastAdd()">เริ่มระบุเวรด่วน</button>
+                    <button class="btn btn-primary w-100 py-2 fw-bold" style="border-radius: 50px;" onclick="startFastAdd()">
+                        <i class="fa-solid fa-bolt me-2"></i>เริ่มระบุเวรด่วน
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="offcanvas offcanvas-top h-100 border-0" tabindex="-1" id="fullScreenMenu" style="background-color: var(--bg-color);">
-        <div class="offcanvas-header container mt-3 pb-0">
-            <h4 class="offcanvas-title fw-bold text-primary"><i class="fa-solid fa-layer-group me-2"></i>เมนูหลัก</h4>
-            <button type="button" class="btn-close bg-white rounded-circle p-2 shadow-sm" data-bs-dismiss="offcanvas"></button>
+    <!-- ═══ OFFCANVAS MENU ═══════════════════════════════════════════════ -->
+    <div class="offcanvas offcanvas-top h-100 border-0" tabindex="-1" id="fullScreenMenu">
+        <div class="offcanvas-header container mt-3 pb-3">
+            <h4 class="offcanvas-title fw-bold">
+                <i class="fa-solid fa-layer-group me-2"></i>เมนูหลัก
+            </h4>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body">
-            <div class="container mt-4">
-                <div class="row g-4 text-center justify-content-center">
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100" onclick="switchView('calendar')" data-bs-dismiss="offcanvas">
+            <div class="container mt-2">
+                <div class="row g-3 justify-content-center">
+                    <div class="col-4 col-md-3 col-lg-2">
+                        <div class="menu-card h-100" onclick="switchView('calendar')" data-bs-dismiss="offcanvas">
                             <div class="menu-icon"><i class="fa-regular fa-calendar-days"></i></div>
                             <h6 class="fw-bold mb-0">ปฏิทินเวร</h6>
                         </div>
                     </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100" onclick="openFastAddModal()" data-bs-dismiss="offcanvas">
+                    <div class="col-4 col-md-3 col-lg-2">
+                        <div class="menu-card h-100" onclick="openFastAddModal()" data-bs-dismiss="offcanvas">
                             <div class="menu-icon"><i class="fa-solid fa-bolt"></i></div>
                             <h6 class="fw-bold mb-0">ระบุเวรด่วน</h6>
                         </div>
                     </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100" onclick="switchView('settings')" data-bs-dismiss="offcanvas">
+                    <div class="col-4 col-md-3 col-lg-2">
+                        <div class="menu-card h-100" onclick="switchView('settings')" data-bs-dismiss="offcanvas">
                             <div class="menu-icon"><i class="fa-solid fa-sliders"></i></div>
                             <h6 class="fw-bold mb-0">ตั้งค่าเวร</h6>
                         </div>
                     </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100" onclick="switchView('holidays')" data-bs-dismiss="offcanvas">
+                    <div class="col-4 col-md-3 col-lg-2">
+                        <div class="menu-card h-100" onclick="switchView('holidays')" data-bs-dismiss="offcanvas">
                             <div class="menu-icon"><i class="fa-solid fa-umbrella-beach"></i></div>
                             <h6 class="fw-bold mb-0">จัดการวันหยุด</h6>
                         </div>
                     </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100" onclick="switchView('system')" data-bs-dismiss="offcanvas">
+                    <div class="col-4 col-md-3 col-lg-2">
+                        <div class="menu-card h-100" onclick="switchView('system')" data-bs-dismiss="offcanvas">
                             <div class="menu-icon"><i class="fa-solid fa-gear"></i></div>
                             <h6 class="fw-bold mb-0">ตั้งค่าระบบ</h6>
                         </div>
                     </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100" onclick="exportToImage()" data-bs-dismiss="offcanvas">
+                    <div class="col-4 col-md-3 col-lg-2">
+                        <div class="menu-card h-100" onclick="exportToImage()" data-bs-dismiss="offcanvas">
                             <div class="menu-icon"><i class="fa-regular fa-image"></i></div>
                             <h6 class="fw-bold mb-0">บันทึกรูปภาพ</h6>
                         </div>
                     </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100" onclick="window.print()" data-bs-dismiss="offcanvas">
+                    <div class="col-4 col-md-3 col-lg-2">
+                        <div class="menu-card h-100" onclick="window.print()" data-bs-dismiss="offcanvas">
                             <div class="menu-icon"><i class="fa-solid fa-print"></i></div>
                             <h6 class="fw-bold mb-0">พิมพ์ / PDF</h6>
                         </div>
                     </div>
-                    <div class="col-6 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100" onclick="exportToICal()" data-bs-dismiss="offcanvas">
+                    <div class="col-4 col-md-3 col-lg-2">
+                        <div class="menu-card h-100" onclick="exportToICal()" data-bs-dismiss="offcanvas">
                             <div class="menu-icon"><i class="fa-solid fa-mobile-screen"></i></div>
                             <h6 class="fw-bold mb-0">ซิงก์ iCal</h6>
                         </div>
                     </div>
                 </div>
+
+                <!-- Menu footer hint -->
+                <div class="text-center mt-5" style="opacity: 0.3;">
+                    <i class="fa-solid fa-notes-medical text-white fs-4"></i>
+                    <p class="text-white small mt-2 mb-0 fw-medium">Radiology Shift Pro</p>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- ═══ MAIN CONTENT ═════════════════════════════════════════════════ -->
     <div class="container mt-4 mb-5">
-        
+
+        <!-- ── Calendar View ─────────────────────────────────────────── -->
         <section id="view-calendar" class="view-section active">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-2">
-                <h4 class="fw-bold mb-0"><i class="fa-regular fa-calendar-check text-primary me-2"></i>ตารางปฏิบัติงาน</h4>
+                <h4 class="section-title mb-0">
+                    <span class="icon-pill"><i class="fa-solid fa-calendar-check"></i></span>
+                    ตารางปฏิบัติงาน
+                </h4>
             </div>
-            
-            <div id="todayStatusHighlight" class="alert small fw-bold mb-4 d-flex align-items-center">
-                <i class="fa-solid fa-circle-notch fa-spin me-3 text-primary fs-5"></i> 
+
+            <div id="todayStatusHighlight" class="alert small fw-bold mb-4 d-flex align-items-center gap-3">
+                <i class="fa-solid fa-circle-notch fa-spin text-primary fs-5"></i>
                 <span class="text-secondary">กำลังตรวจสอบข้อมูลวันนี้...</span>
             </div>
 
@@ -339,111 +690,152 @@
                     </div>
                 </div>
                 <div class="col-lg-3">
-                    <div class="card summary-card mb-4">
-                        <div class="card-header fw-bold pt-3 pb-3 fs-6 border-0 d-flex align-items-center">
-                            <div class="bg-white rounded-circle p-2 shadow-sm me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                <i class="fa-solid fa-chart-pie text-primary"></i>
-                            </div>
+                    <div class="summary-card mb-4">
+                        <div class="card-header fw-bold fs-6 d-flex align-items-center gap-2 border-0">
+                            <span class="icon-pill" style="width:30px;height:30px;border-radius:8px;font-size:0.75rem;">
+                                <i class="fa-solid fa-chart-pie"></i>
+                            </span>
                             สรุปเดือนนี้
                         </div>
                         <div class="card-body pt-2" id="summaryList"></div>
                     </div>
-                    <div class="card summary-card">
-                        <div class="card-header fw-bold text-danger pt-3 pb-3 fs-6 border-0 d-flex align-items-center">
-                            <div class="bg-white rounded-circle p-2 shadow-sm me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                <i class="fa-regular fa-calendar-xmark text-danger"></i>
-                            </div>
-                            วันหยุดประจำเดือน
+                    <div class="summary-card">
+                        <div class="card-header fw-bold fs-6 d-flex align-items-center gap-2 border-0">
+                            <span class="icon-pill danger" style="width:30px;height:30px;border-radius:8px;font-size:0.75rem;">
+                                <i class="fa-regular fa-calendar-xmark"></i>
+                            </span>
+                            <span class="text-danger">วันหยุดประจำเดือน</span>
                         </div>
-                        <ul class="list-group list-group-flush border-top-0 border-0 ms-3 me-3 pt-2 pb-2" id="holidayList"></ul>
+                        <ul class="list-group list-group-flush border-0 mx-3 my-2" id="holidayList"></ul>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- ── Settings View ─────────────────────────────────────────── -->
         <section id="view-settings" class="view-section">
+            <div class="mb-4">
+                <h4 class="section-title">
+                    <span class="icon-pill"><i class="fa-solid fa-sliders"></i></span>
+                    ตั้งค่าประเภทเวร
+                </h4>
+            </div>
             <div class="row justify-content-center g-4">
                 <div class="col-md-5">
                     <div class="card p-4 h-100">
-                        <h5 class="fw-bold mb-4 text-primary"><i class="fa-solid fa-pen-to-square me-2"></i>จัดการประเภทเวร</h5>
-                        <div class="mb-4">
-                            <label class="form-label small text-muted fw-bold">ชื่อเวร (เช่น เช้า, บ่าย, ดึก)</label>
+                        <h5 class="fw-bold mb-4" style="color: var(--primary);">
+                            <i class="fa-solid fa-pen-to-square me-2"></i>จัดการประเภทเวร
+                        </h5>
+                        <div class="mb-3">
+                            <label class="form-label">ชื่อเวร (เช่น เช้า, บ่าย, ดึก)</label>
                             <input type="text" id="typeName" class="form-control" placeholder="ระบุชื่อเวร">
                         </div>
-                        <div class="mb-4">
-                            <label class="form-label small text-muted fw-bold">กำหนดสี</label>
-                            <input type="color" id="typeColor" class="form-control form-control-color w-100 border-0 p-0 rounded-3 overflow-hidden shadow-sm" style="height: 45px; cursor: pointer;" value="#6366f1">
+                        <div class="mb-3">
+                            <label class="form-label">กำหนดสี</label>
+                            <input type="color" id="typeColor" class="form-control form-control-color" value="#6366f1">
                         </div>
-                        <div class="mb-3 bg-light p-3 rounded-3 border">
+                        <div class="mb-3 p-3 rounded-3" style="background: var(--surface-2); border: 1.5px solid var(--border);">
                             <div class="form-check form-switch d-flex align-items-center p-0">
-                                <label class="form-check-label small text-dark fw-bold flex-grow-1" for="toggleTime">ระบุช่วงเวลา (ไม่บังคับ)</label>
-                                <input class="form-check-input ms-0 mt-0" type="checkbox" id="toggleTime" style="width: 2.5em; height: 1.25em; cursor: pointer;">
+                                <label class="form-check-label fw-bold flex-grow-1 small" for="toggleTime">ระบุช่วงเวลา (ไม่บังคับ)</label>
+                                <input class="form-check-input ms-0 mt-0" type="checkbox" id="toggleTime" style="width:2.5em;height:1.25em;cursor:pointer;">
                             </div>
                         </div>
-                        <div id="timeInputSection" style="display: none;">
+                        <div id="timeInputSection" style="display:none;">
                             <div class="row g-3">
                                 <div class="col-6">
-                                    <label class="small text-muted mb-1 fw-bold">เวลาเริ่มต้น</label>
+                                    <label class="form-label">เวลาเริ่มต้น</label>
                                     <input type="time" id="startTime" class="form-control">
                                 </div>
                                 <div class="col-6">
-                                    <label class="small text-muted mb-1 fw-bold">เวลาสิ้นสุด</label>
+                                    <label class="form-label">เวลาสิ้นสุด</label>
                                     <input type="time" id="endTime" class="form-control">
                                 </div>
                             </div>
                         </div>
-                        <div class="mt-4 border-top pt-4 text-center">
-                            <span class="text-muted small d-block mb-3 fw-bold">ตัวอย่างการแสดงผลบนปฏิทิน</span>
-                            <div id="previewEvent" class="preview-event text-white" style="background: var(--primary-color);">ชื่อเวร</div>
+                        <div class="mt-4 pt-4 text-center" style="border-top: 1.5px dashed var(--border);">
+                            <span class="text-muted small fw-bold d-block mb-3">ตัวอย่างการแสดงผลบนปฏิทิน</span>
+                            <div id="previewEvent" class="preview-event text-white" style="background: var(--primary);">ชื่อเวร</div>
                         </div>
-                        <button class="btn btn-primary w-100 mt-4 py-2 fw-bold" id="saveTypeBtn">บันทึกประเภทเวร</button>
+                        <button class="btn btn-primary w-100 mt-4 py-2 fw-bold" id="saveTypeBtn">
+                            <i class="fa-solid fa-floppy-disk me-2"></i>บันทึกประเภทเวร
+                        </button>
                     </div>
                 </div>
                 <div class="col-md-7">
                     <div class="card p-4 h-100">
-                        <h5 class="fw-bold mb-4"><i class="fa-solid fa-list-check me-2 text-muted"></i>รายการประเภทเวรทั้งหมด</h5>
-                        <div id="shiftTypeList" class="list-group list-group-flush rounded-3 border"></div>
+                        <h5 class="fw-bold mb-4">
+                            <i class="fa-solid fa-list-check me-2 text-muted"></i>รายการประเภทเวรทั้งหมด
+                        </h5>
+                        <div id="shiftTypeList" class="list-group list-group-flush rounded-3 border" style="border-color: var(--border-soft) !important;"></div>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- ── Holidays View ─────────────────────────────────────────── -->
         <section id="view-holidays" class="view-section">
+            <div class="mb-4">
+                <h4 class="section-title">
+                    <span class="icon-pill" style="background: var(--grad-success); box-shadow: 0 4px 12px rgba(16,185,129,0.35);">
+                        <i class="fa-solid fa-umbrella-beach"></i>
+                    </span>
+                    จัดการวันหยุด
+                </h4>
+            </div>
             <div class="row justify-content-center g-4">
                 <div class="col-md-5">
                     <div class="card p-4 h-100">
-                        <h5 class="fw-bold mb-4 text-primary" id="holidayFormTitle"><i class="fa-solid fa-calendar-plus me-2"></i>เพิ่มวันหยุดใหม่</h5>
+                        <h5 class="fw-bold mb-4" style="color: var(--primary);" id="holidayFormTitle">
+                            <i class="fa-solid fa-calendar-plus me-2"></i>เพิ่มวันหยุดใหม่
+                        </h5>
                         <input type="hidden" id="editHolidayId">
-                        <div class="mb-4">
-                            <label class="form-label small text-muted fw-bold">วันที่หยุด</label>
+                        <div class="mb-3">
+                            <label class="form-label">วันที่หยุด</label>
                             <input type="date" id="holidayDate" class="form-control">
                         </div>
-                        <div class="mb-4">
-                            <label class="form-label small text-muted fw-bold">ชื่อวันหยุด / เทศกาล</label>
+                        <div class="mb-3">
+                            <label class="form-label">ชื่อวันหยุด / เทศกาล</label>
                             <input type="text" id="holidayName" class="form-control" placeholder="เช่น วันปีใหม่, วันหยุดพิเศษ">
                         </div>
                         <div class="d-flex flex-column gap-2 mt-4">
-                            <button class="btn btn-primary w-100 py-2 fw-bold" id="saveHolidayBtn">บันทึกวันหยุด</button>
-                            <button class="btn btn-light w-100 py-2 fw-bold d-none text-danger" id="cancelEditHolidayBtn">ยกเลิกแก้ไข</button>
+                            <button class="btn btn-primary w-100 py-2 fw-bold" id="saveHolidayBtn">
+                                <i class="fa-solid fa-floppy-disk me-2"></i>บันทึกวันหยุด
+                            </button>
+                            <button class="btn btn-light w-100 py-2 fw-bold d-none text-danger" id="cancelEditHolidayBtn">
+                                <i class="fa-solid fa-xmark me-2"></i>ยกเลิกแก้ไข
+                            </button>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-7">
                     <div class="card p-4 h-100">
-                        <h5 class="fw-bold mb-4"><i class="fa-solid fa-list me-2 text-muted"></i>รายการวันหยุดที่กำหนดเอง</h5>
-                        <div id="customHolidayList" class="list-group list-group-flush rounded-3 border"></div>
+                        <h5 class="fw-bold mb-4">
+                            <i class="fa-solid fa-list me-2 text-muted"></i>รายการวันหยุดที่กำหนดเอง
+                        </h5>
+                        <div id="customHolidayList" class="list-group list-group-flush rounded-3 border" style="border-color: var(--border-soft) !important;"></div>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- ── System Settings View ──────────────────────────────────── -->
         <section id="view-system" class="view-section">
+            <div class="mb-4">
+                <h4 class="section-title">
+                    <span class="icon-pill" style="background: linear-gradient(135deg,#8b5cf6,#a78bfa); box-shadow: 0 4px 12px rgba(139,92,246,0.35);">
+                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                    </span>
+                    ตั้งค่าระบบ
+                </h4>
+            </div>
             <div class="row justify-content-center">
                 <div class="col-md-8">
-                    <div class="card p-4 border-0">
-                        <h5 class="fw-bold mb-4 text-primary"><i class="fa-solid fa-screwdriver-wrench me-2"></i>ตั้งค่าระบบและปฏิทิน</h5>
-                        <div class="mb-2 bg-light p-4 rounded-4 border">
-                            <label class="form-label text-dark fw-bold mb-3 fs-6">เลือกวันเริ่มต้นของสัปดาห์</label>
+                    <div class="card p-4">
+                        <h5 class="fw-bold mb-4" style="color: var(--primary);">
+                            <i class="fa-solid fa-screwdriver-wrench me-2"></i>ตั้งค่าระบบและปฏิทิน
+                        </h5>
+                        <div class="p-4 rounded-3" style="background: var(--surface-2); border: 1.5px solid var(--border);">
+                            <label class="fw-bold mb-3 d-block" style="color: var(--text);">เลือกวันเริ่มต้นของสัปดาห์</label>
                             <div class="d-flex flex-wrap gap-2" id="dayOfWeekSelector">
                                 <button class="btn day-btn" data-day="0">อาทิตย์</button>
                                 <button class="btn day-btn" data-day="1">จันทร์</button>
@@ -453,8 +845,8 @@
                                 <button class="btn day-btn" data-day="5">ศุกร์</button>
                                 <button class="btn day-btn" data-day="6">เสาร์</button>
                             </div>
-                            <div class="mt-4 pt-3 border-top d-flex align-items-center text-muted small">
-                                <i class="fa-solid fa-circle-info fs-5 me-2 text-primary"></i>
+                            <div class="info-note mt-4 d-flex align-items-start gap-2">
+                                <i class="fa-solid fa-circle-info mt-1"></i>
                                 <span>ระบบจะจดจำค่าและปรับการแสดงผลในหน้าปฏิทินอัตโนมัติ</span>
                             </div>
                         </div>
@@ -464,21 +856,27 @@
         </section>
     </div>
 
+    <!-- ═══ ADD EVENT MODAL ══════════════════════════════════════════════ -->
     <div class="modal fade" id="addEventModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered px-3">
             <div class="modal-content">
                 <div class="modal-header border-0 pb-0 mt-3 px-4">
-                    <h5 class="fw-bold mb-0"><i class="fa-solid fa-calendar-plus text-primary me-2"></i>บันทึกเวร <span id="modalDateLabel" class="text-muted fs-6 ms-2 fw-normal"></span></h5>
-                    <button type="button" class="btn-close bg-light rounded-circle p-2" data-bs-dismiss="modal"></button>
+                    <h5 class="fw-bold mb-0">
+                        <i class="fa-solid fa-calendar-plus text-primary me-2"></i>บันทึกเวร
+                        <span id="modalDateLabel" class="text-muted fs-6 ms-2 fw-normal"></span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body py-4 px-4">
-                    <label class="small text-muted fw-bold mb-3 d-block">เลือกประเภทเวร</label>
+                    <label class="form-label mb-3 d-block">เลือกประเภทเวร</label>
                     <div id="modalShiftButtons" class="d-flex flex-wrap gap-2 mb-4"></div>
-                    
-                    <label class="small text-muted fw-bold mb-2 d-block">โน้ตเพิ่มเติม (ถ้ามี)</label>
+
+                    <label class="form-label mb-2 d-block">โน้ตเพิ่มเติม (ถ้ามี)</label>
                     <textarea id="modalNote" class="form-control mb-4" rows="3" placeholder="เช่น รพ. A, เปลี่ยนเวรกับ..."></textarea>
-                    
-                    <button id="modalSaveBtn" class="btn btn-primary w-100 py-3 fw-bold rounded-pill text-uppercase tracking-wide">บันทึกข้อมูล</button>
+
+                    <button id="modalSaveBtn" class="btn btn-primary w-100 py-3 fw-bold" style="border-radius: 50px; letter-spacing: 0.5px;">
+                        <i class="fa-solid fa-floppy-disk me-2"></i>บันทึกข้อมูล
+                    </button>
                 </div>
             </div>
         </div>
@@ -493,11 +891,8 @@
         function switchView(viewId) {
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.getElementById('view-' + viewId).classList.add('active');
-            
             if (viewId === 'calendar' && window.calendarInstance) {
-                setTimeout(() => {
-                    window.calendarInstance.updateSize();
-                }, 10);
+                setTimeout(() => window.calendarInstance.updateSize(), 10);
             }
         }
     </script>

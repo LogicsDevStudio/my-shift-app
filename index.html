@@ -23,9 +23,11 @@
         .view-section.active { display: block; }
         .shift-btn { transition: opacity 0.2s; }
         
-        /* สไตล์สำหรับปุ่มเลือกวัน */
         .day-btn { flex: 1; border-radius: 10px; font-weight: 500; transition: all 0.2s; }
         .day-btn.active { background-color: #0d6efd; color: white; border-color: #0d6efd; transform: scale(1.05); box-shadow: 0 4px 8px rgba(13,110,253,0.3); }
+        
+        /* สไตล์ป้องกันการคลิกและตกแต่งวันหยุดในปฏิทิน */
+        .holiday-event { pointer-events: none; opacity: 0.9; font-size: 0.8rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
@@ -123,7 +125,7 @@
                         <div class="card-body" id="summaryList"></div>
                     </div>
                     <div class="card summary-card border-0">
-                        <div class="card-header bg-white border-0 fw-bold text-danger pt-3">🇹🇭 วันหยุดประจำเดือน</div>
+                        <div class="card-header bg-white border-0 fw-bold text-danger pt-3">🗓️ วันหยุดประจำเดือน</div>
                         <ul class="list-group list-group-flush" id="holidayList"></ul>
                     </div>
                 </div>
@@ -199,7 +201,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="card shadow-sm border-0 p-4 rounded-4">
-                        <h5 class="fw-bold mb-3 text-secondary">รายการวันหยุดที่กำหนดเอง</h5>
+                        <h5 class="fw-bold mb-3 text-secondary">รายการวันหยุดที่กำหนดเอง (🌴)</h5>
                         <div id="customHolidayList" class="list-group list-group-flush"></div>
                     </div>
                 </div>
@@ -223,7 +225,7 @@
                                 <button class="btn btn-outline-secondary day-btn" data-day="5">ศุกร์</button>
                                 <button class="btn btn-outline-secondary day-btn" data-day="6">เสาร์</button>
                             </div>
-                            <small class="text-muted mt-2 d-block">* การตั้งค่านี้จะเปลี่ยนการแสดงผลในหน้าปฏิทินทันที</small>
+                            <small class="text-muted mt-2 d-block">* ระบบจะจดจำค่าที่คุณเลือกและปรับการแสดงผลในหน้าปฏิทิน</small>
                         </div>
                     </div>
                 </div>
@@ -259,6 +261,13 @@
         function switchView(viewId) {
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.getElementById('view-' + viewId).classList.add('active');
+            
+            // แจ้งให้ Calendar อัปเดตขนาดเมื่อแสดงผล เพื่อแก้ปัญหาปฏิทินเพี้ยนโดยไม่ต้องรีเฟรช
+            if (viewId === 'calendar' && window.calendarInstance) {
+                setTimeout(() => {
+                    window.calendarInstance.updateSize();
+                }, 10);
+            }
         }
     </script>
 </body>

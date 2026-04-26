@@ -21,6 +21,7 @@
         .summary-card { border-radius: 12px; border: none; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .view-section { display: none; }
         .view-section.active { display: block; }
+        .shift-btn { transition: opacity 0.2s; } /* สำหรับปุ่มเลือกเวร */
     </style>
 </head>
 <body>
@@ -42,6 +43,21 @@
             </div>
             <div id="fastAddButtons" class="d-flex gap-2 overflow-auto pb-2">
                 </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="fastAddDateModal" tabindex="-1">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h6 class="fw-bold mb-0">เลือกวันเริ่มต้นลงเวร</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body py-4 text-center">
+                    <input type="date" id="fastAddStartDate" class="form-control mb-3 text-center">
+                    <button class="btn btn-success w-100 py-2 fw-bold" onclick="startFastAdd()">เริ่มระบุเวรด่วน</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -83,12 +99,11 @@
     </div>
 
     <div class="container mt-4 mb-5">
-        
         <section id="view-calendar" class="view-section active">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold mb-0">ปฏิทินปฏิบัติงาน</h4>
-                <button class="btn btn-success rounded-pill fw-bold" onclick="toggleFastAdd(true)">
-                    <i class="fa-solid fa-bolt me-2"></i> ระบุเวรแบบรวดเร็ว
+                <button class="btn btn-success rounded-pill fw-bold" onclick="openFastAddModal()">
+                    <i class="fa-solid fa-bolt me-2"></i> ระบุเวรด่วน
                 </button>
             </div>
 
@@ -101,8 +116,7 @@
                 <div class="col-lg-3">
                     <div class="card summary-card mb-3">
                         <div class="card-header bg-white border-0 fw-bold pt-3">📊 สรุปเดือนนี้</div>
-                        <div class="card-body" id="summaryList">
-                            </div>
+                        <div class="card-body" id="summaryList"></div>
                     </div>
                     <div class="card summary-card border-0">
                         <div class="card-header bg-white border-0 fw-bold text-danger pt-3">🇹🇭 วันหยุดราชการ</div>
@@ -119,7 +133,7 @@
                         <h4 class="fw-bold mb-4">จัดการประเภทเวร</h4>
                         <input type="hidden" id="editTypeId">
                         <div class="mb-3">
-                            <label class="form-label small fw-bold">ชื่อเวร (เช่น เวรเช้า, บ่าย, ดึก)</label>
+                            <label class="form-label small fw-bold">ชื่อเวร (เช่น เช้า, บ่าย, ดึก)</label>
                             <input type="text" id="typeName" class="form-control rounded-3" placeholder="ระบุชื่อเวร">
                         </div>
                         <div class="mb-3">
@@ -154,8 +168,7 @@
                 <div class="col-md-6">
                     <div class="card shadow-sm border-0 p-4 rounded-4">
                         <h5 class="fw-bold mb-3 text-secondary">รายการประเภทเวรทั้งหมด</h5>
-                        <div id="shiftTypeList" class="list-group list-group-flush">
-                            </div>
+                        <div id="shiftTypeList" class="list-group list-group-flush"></div>
                     </div>
                 </div>
             </div>
@@ -166,15 +179,16 @@
         <div class="modal-dialog modal-sm modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg rounded-4">
                 <div class="modal-header border-0 pb-0">
-                    <h6 class="fw-bold mb-0">บันทึกเวรลงวันที่ <span id="modalDateLabel"></span></h6>
+                    <h6 class="fw-bold mb-0">บันทึกเวร <span id="modalDateLabel" class="text-primary"></span></h6>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body py-4">
-                    <label class="small fw-bold mb-1">เลือกประเภทเวร</label>
-                    <select id="modalShiftSelect" class="form-select mb-3"></select>
+                    <label class="small fw-bold mb-2">เลือกประเภทเวร</label>
+                    <div id="modalShiftButtons" class="d-flex flex-wrap gap-2 mb-3">
+                        </div>
                     
                     <label class="small fw-bold mb-1">โน้ตเพิ่มเติม (ถ้ามี)</label>
-                    <textarea id="modalNote" class="form-control mb-3" rows="2" placeholder="เช่น รพ. A, เคสพิเศษ..."></textarea>
+                    <textarea id="modalNote" class="form-control mb-3" rows="2" placeholder="เช่น รพ. A, เปลี่ยนเวรกับ..."></textarea>
                     
                     <button id="modalSaveBtn" class="btn btn-primary w-100 py-2 fw-bold">บันทึกข้อมูล</button>
                 </div>

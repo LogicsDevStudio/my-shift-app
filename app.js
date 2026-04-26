@@ -14,55 +14,55 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 let calendar;
-let allHolidays = []; 
-let customHolidaysData = []; 
-let allShiftsData = []; 
-let shiftTypesList = []; 
+let allHolidays = [];
+let customHolidaysData = [];
+let allShiftsData = [];
+let shiftTypesList = [];
 
 let currentSelectedDate = "";
-let currentSelectedShiftType = null; 
+let currentSelectedShiftType = null;
 let isFastAddMode = false;
 let fastAddCurrentDate = null;
 
 let currentFirstDay = parseInt(localStorage.getItem('calendarFirstDay') || '0');
 
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', async function () {
     await loadHolidays();
     initSystemSettings();
     initHolidaySettings();
     initSettingsView();
     initCalendarView();
-    listenToDatabase(); 
+    listenToDatabase();
 });
 
 async function loadHolidays() {
     try {
         const year = new Date().getFullYear();
         const res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/TH`);
-        if(res.ok && res.status !== 204) {
+        if (res.ok && res.status !== 204) {
             const text = await res.text();
-            if(text && text.trim().length > 0) {
+            if (text && text.trim().length > 0) {
                 allHolidays = JSON.parse(text);
-                updateTodayStatus(); 
+                updateTodayStatus();
             }
         }
-    } catch(e) { console.warn("ไม่สามารถโหลดวันหยุดได้", e); }
+    } catch (e) { console.warn("ไม่สามารถโหลดวันหยุดได้", e); }
 }
 
 function listenToDatabase() {
     onSnapshot(collection(db, "shifts"), (snapshot) => {
         allShiftsData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        if(calendar) {
+        if (calendar) {
             calendar.refetchEvents();
             updateSidebarSummary(calendar.view.currentStart);
         }
-        updateTodayStatus(); 
+        updateTodayStatus();
     });
 
     onSnapshot(collection(db, "customHolidays"), (snapshot) => {
         customHolidaysData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderCustomHolidaysAdmin(); 
-        if(calendar) {
+        renderCustomHolidaysAdmin();
+        if (calendar) {
             calendar.refetchEvents();
             updateSidebarSummary(calendar.view.currentStart);
         }
@@ -70,6 +70,7 @@ function listenToDatabase() {
     });
 }
 
+// ─── Today Status ─────────────────────────────────────────────────────────────
 function updateTodayStatus() {
     const statusBox = document.getElementById('todayStatusHighlight');
     if (!statusBox) return;
@@ -81,95 +82,111 @@ function updateTodayStatus() {
     let isHoliday = false;
 
     const apiHoliday = allHolidays.find(h => h.date === localDate);
-    if (apiHoliday) {
-        statusMessages.push(`🇹🇭 ${apiHoliday.localName}`);
-        isHoliday = true;
-    }
+    if (apiHoliday) { statusMessages.push(`🇹🇭 ${apiHoliday.localName}`); isHoliday = true; }
 
     const customHoliday = customHolidaysData.find(h => h.date === localDate);
-    if (customHoliday) {
-        statusMessages.push(`🌴 ${customHoliday.name}`);
-        isHoliday = true;
-    }
+    if (customHoliday) { statusMessages.push(`🌴 ${customHoliday.name}`); isHoliday = true; }
 
     const todayShifts = allShiftsData.filter(s => s.date === localDate);
-    
-    // [UI อัปเกรด] เพิ่มพื้นหลังแบบ Gradient, จัด Layout ให้โปร่งขึ้น และเน้นไอคอนให้ชัดเจน
+
     if (todayShifts.length > 0) {
-        let shiftBadges = todayShifts.map(s => `<span class="badge rounded-pill shadow-sm ms-2 px-3 py-2 border border-light" style="background-color: ${s.color}; font-size: 0.9rem; letter-spacing: 0.5px;">${s.name}</span>`).join('');
-        
-        statusBox.className = "alert alert-warning shadow-sm fw-bold mb-4 d-flex align-items-center rounded-4 border border-warning bg-gradient p-3";
-        let prefix = isHoliday ? `<span class="text-muted small d-block mb-1">${statusMessages.join(' | ')}</span> วันนี้มีเวร ` : `วันนี้คุณมีเวร `;
+        const shiftBadges = todayShifts.map(s => `
+            <span class="badge rounded-pill px-3 py-2 fw-bold ms-1" 
+                  style="background:${s.color}; color:#fff; font-size:0.82rem; box-shadow:0 4px 12px ${s.color}55; letter-spacing:0.3px;">
+                ${s.name}
+            </span>`).join('');
+
+        const holidayNote = isHoliday
+            ? `<span class="d-block small fw-normal mt-1" style="color:rgba(180,90,0,0.8);">${statusMessages.join(' | ')}</span>`
+            : '';
+
+        statusBox.className = "alert fw-bold mb-4 d-flex align-items-center rounded-pill";
+        statusBox.style.cssText = `
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border: 1.5px solid rgba(245,158,11,0.3);
+            box-shadow: 0 4px 20px rgba(245,158,11,0.12);
+            padding: 14px 24px;
+        `;
         statusBox.innerHTML = `
-            <div class="d-flex align-items-center w-100">
-                <div class="bg-white p-3 rounded-circle shadow-sm me-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                    <i class="fa-solid fa-user-doctor fs-4 text-warning"></i>
-                </div> 
-                <div class="flex-grow-1"><span class="text-dark fs-6">${prefix}</span> <div class="mt-2">${shiftBadges}</div></div>
-            </div>`;
-        
-    } else if (isHoliday) {
-        statusBox.className = "alert alert-success shadow-sm fw-bold mb-4 d-flex align-items-center rounded-4 border border-success bg-gradient p-3";
-        statusBox.innerHTML = `
-            <div class="d-flex align-items-center w-100">
-                <div class="bg-white p-3 rounded-circle shadow-sm me-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                    <i class="fa-solid fa-umbrella-beach fs-4 text-success"></i>
-                </div> 
+            <div class="d-flex align-items-center gap-3 w-100 flex-wrap">
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                     style="width:44px;height:44px;background:linear-gradient(135deg,#f59e0b,#f97316);box-shadow:0 6px 16px rgba(245,158,11,0.4);">
+                    <i class="fa-solid fa-user-doctor text-white" style="font-size:1.1rem;"></i>
+                </div>
                 <div>
-                    <span class="text-dark fs-6">วันนี้เป็นวันหยุด: <span class="text-success">${statusMessages.join(' | ')}</span></span><br>
-                    <span class="text-secondary small fw-normal mt-1 d-block">พักผ่อนได้เลย เติมพลังให้เต็มที่ ✨</span>
+                    <span style="color:#92400e;font-size:0.92rem;">วันนี้คุณมีเวร</span>
+                    ${holidayNote}
+                    <div class="mt-1 d-flex flex-wrap gap-1">${shiftBadges}</div>
                 </div>
             </div>`;
-    } else {
-        statusBox.className = "alert bg-light text-secondary shadow-sm fw-bold mb-4 d-flex align-items-center rounded-4 border p-3";
+
+    } else if (isHoliday) {
+        statusBox.className = "alert fw-bold mb-4 d-flex align-items-center rounded-pill";
+        statusBox.style.cssText = `
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border: 1.5px solid rgba(16,185,129,0.25);
+            box-shadow: 0 4px 20px rgba(16,185,129,0.1);
+            padding: 14px 24px;
+        `;
         statusBox.innerHTML = `
-            <div class="d-flex align-items-center w-100">
-                <div class="bg-white p-3 rounded-circle border shadow-sm me-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                    <i class="fa-solid fa-mug-hot fs-4 text-secondary"></i>
-                </div> 
+            <div class="d-flex align-items-center gap-3 w-100">
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                     style="width:44px;height:44px;background:linear-gradient(135deg,#10b981,#06b6d4);box-shadow:0 6px 16px rgba(16,185,129,0.4);">
+                    <i class="fa-solid fa-umbrella-beach text-white" style="font-size:1.1rem;"></i>
+                </div>
                 <div>
-                    <span class="text-dark fs-6">วันนี้ไม่มีเวร</span><br>
-                    <span class="text-muted small fw-normal mt-1 d-block">พักผ่อนได้เต็มที่ Have a good day! ☕</span>
+                    <span style="color:#065f46;font-size:0.92rem;">วันนี้เป็นวันหยุด</span>
+                    <span class="fw-bold ms-1" style="color:#059669;">${statusMessages.join(' | ')}</span>
+                    <span class="d-block small fw-normal mt-1" style="color:rgba(6,95,70,0.7);">พักผ่อนได้เลย เติมพลังให้เต็มที่ ✨</span>
+                </div>
+            </div>`;
+
+    } else {
+        statusBox.className = "alert fw-bold mb-4 d-flex align-items-center rounded-pill";
+        statusBox.style.cssText = `
+            background: linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%);
+            border: 1.5px solid rgba(99,102,241,0.15);
+            box-shadow: 0 4px 20px rgba(99,102,241,0.06);
+            padding: 14px 24px;
+        `;
+        statusBox.innerHTML = `
+            <div class="d-flex align-items-center gap-3 w-100">
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                     style="width:44px;height:44px;background:linear-gradient(135deg,#6366f1,#8b5cf6);box-shadow:0 6px 16px rgba(99,102,241,0.35);">
+                    <i class="fa-solid fa-mug-hot text-white" style="font-size:1.1rem;"></i>
+                </div>
+                <div>
+                    <span style="color:#3730a3;font-size:0.92rem;">วันนี้ไม่มีเวร</span>
+                    <span class="d-block small fw-normal mt-1" style="color:rgba(55,48,163,0.6);">พักผ่อนได้เต็มที่ Have a good day! ☕</span>
                 </div>
             </div>`;
     }
 }
 
+// ─── System Settings ──────────────────────────────────────────────────────────
 function initSystemSettings() {
     const dayButtons = document.querySelectorAll('.day-btn');
-    
     dayButtons.forEach(btn => {
-        if(parseInt(btn.dataset.day) === currentFirstDay) {
-            btn.classList.add('active');
-        }
-        
+        if (parseInt(btn.dataset.day) === currentFirstDay) btn.classList.add('active');
         btn.addEventListener('click', (e) => {
             dayButtons.forEach(b => b.classList.remove('active'));
             e.target.classList.add('active');
-            
             currentFirstDay = parseInt(e.target.dataset.day);
             localStorage.setItem('calendarFirstDay', currentFirstDay);
-            if(calendar) {
-                calendar.setOption('firstDay', currentFirstDay);
-            }
+            if (calendar) calendar.setOption('firstDay', currentFirstDay);
         });
     });
 }
 
+// ─── Holiday Settings ─────────────────────────────────────────────────────────
 function initHolidaySettings() {
-    const saveBtn = document.getElementById('saveHolidayBtn');
-    const cancelBtn = document.getElementById('cancelEditHolidayBtn');
-    
-    saveBtn.addEventListener('click', async () => {
+    document.getElementById('saveHolidayBtn').addEventListener('click', async () => {
         const hDate = document.getElementById('holidayDate').value;
         const hName = document.getElementById('holidayName').value;
         const editId = document.getElementById('editHolidayId').value;
-        
-        if(!hDate || !hName) return alert("กรุณาระบุวันที่และชื่อวันหยุดให้ครบถ้วน");
-
-        const data = { date: hDate, name: hName }; 
-
-        if(editId) {
+        if (!hDate || !hName) return alert("กรุณาระบุวันที่และชื่อวันหยุดให้ครบถ้วน");
+        const data = { date: hDate, name: hName };
+        if (editId) {
             await updateDoc(doc(db, "customHolidays", editId), data);
             alert("แก้ไขวันหยุดสำเร็จ");
         } else {
@@ -178,49 +195,66 @@ function initHolidaySettings() {
         }
         resetHolidayForm();
     });
-
-    cancelBtn.addEventListener('click', resetHolidayForm);
+    document.getElementById('cancelEditHolidayBtn').addEventListener('click', resetHolidayForm);
 }
 
 function resetHolidayForm() {
     document.getElementById('holidayDate').value = "";
     document.getElementById('holidayName').value = "";
     document.getElementById('editHolidayId').value = "";
-    document.getElementById('saveHolidayBtn').innerHTML = "<i class='fa-solid fa-save me-1'></i> บันทึกวันหยุด";
+    document.getElementById('saveHolidayBtn').innerHTML = `<i class="fa-solid fa-floppy-disk me-2"></i>บันทึกวันหยุด`;
     document.getElementById('cancelEditHolidayBtn').classList.add('d-none');
-    document.getElementById('holidayFormTitle').innerText = "เพิ่มวันหยุดใหม่";
+    document.getElementById('holidayFormTitle').innerHTML = `<i class="fa-solid fa-calendar-plus me-2"></i>เพิ่มวันหยุดใหม่`;
 }
 
+// ─── Render Custom Holidays Admin List ────────────────────────────────────────
 function renderCustomHolidaysAdmin() {
     const list = document.getElementById('customHolidayList');
     list.innerHTML = "";
-    
+
     const sorted = [...customHolidaysData].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    if (sorted.length === 0) {
+        list.innerHTML = `
+            <div class="text-center py-5 text-muted">
+                <i class="fa-solid fa-calendar-xmark fs-2 mb-3 d-block" style="color:rgba(99,102,241,0.25);"></i>
+                <span class="small fw-medium">ยังไม่มีวันหยุดที่กำหนดเอง</span>
+            </div>`;
+        return;
+    }
 
     sorted.forEach(h => {
         const hDate = new Date(h.date);
         const day = hDate.getDate();
-        const month = hDate.toLocaleDateString('th-TH', { month:'short' });
-        
+        const month = hDate.toLocaleDateString('th-TH', { month: 'short' });
+        const yearTH = hDate.getFullYear() + 543;
+
         const item = document.createElement('div');
-        // [UI อัปเกรด] เปลี่ยนจาก p-3 เป็น p-4 เพื่อเพิ่มระยะห่างจากขอบ (Padding) ให้ดูโปร่งขึ้น
-        item.className = "list-group-item d-flex justify-content-between align-items-center mb-3 shadow-sm rounded-4 bg-white border border-light p-4 hover-effect";
-        item.style.transition = "all 0.2s ease-in-out";
+        item.className = "list-group-item d-flex justify-content-between align-items-center";
         item.innerHTML = `
-            <div class="d-flex align-items-center gap-4"> <div class="bg-danger bg-opacity-10 text-danger rounded-4 p-2 text-center d-flex flex-column justify-content-center border border-danger border-opacity-25" style="min-width: 60px; height: 60px;">
-                    <div class="fw-bold fs-4 lh-1">${day}</div>
-                    <div class="small fw-semibold mt-1" style="font-size: 0.75rem;">${month}</div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-3 text-center d-flex flex-column align-items-center justify-content-center flex-shrink-0"
+                     style="width:52px;height:52px;background:linear-gradient(135deg,rgba(244,63,94,0.1),rgba(244,63,94,0.06));border:1.5px solid rgba(244,63,94,0.2);">
+                    <div class="fw-bold lh-1" style="font-size:1.2rem;color:#e11d48;">${day}</div>
+                    <div class="fw-semibold mt-1" style="font-size:0.68rem;color:#f43f5e;text-transform:uppercase;letter-spacing:0.3px;">${month}</div>
                 </div>
                 <div>
-                    <div class="fw-bold text-dark fs-6 mb-1">🌴 ${h.name}</div>
-                    <div class="text-muted small d-flex align-items-center gap-1"><i class="fa-regular fa-calendar-days"></i> ปี ${hDate.getFullYear() + 543}</div>
+                    <div class="fw-bold mb-1" style="font-size:0.95rem;color:#1e1b4b;">🌴 ${h.name}</div>
+                    <div class="small d-flex align-items-center gap-1" style="color:#94a3b8;">
+                        <i class="fa-regular fa-calendar-days" style="font-size:0.75rem;"></i> พ.ศ. ${yearTH}
+                    </div>
                 </div>
             </div>
             <div class="d-flex gap-2">
-                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-2 shadow-sm" onclick="editCustomHoliday('${h.id}', '${h.date}', '${h.name}')" title="แก้ไข"><i class="fa-solid fa-pen"></i></button>
-                <button class="btn btn-sm btn-outline-danger rounded-pill px-3 py-2 shadow-sm" onclick="deleteCustomHoliday('${h.id}')" title="ลบ"><i class="fa-solid fa-trash-can"></i></button>
-            </div>
-        `;
+                <button class="btn btn-sm btn-light" style="border-radius:10px;border:1.5px solid #e2e8f0;width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;"
+                    onclick="editCustomHoliday('${h.id}', '${h.date}', '${h.name}')" title="แก้ไข">
+                    <i class="fa-solid fa-pen" style="font-size:0.8rem;color:#64748b;"></i>
+                </button>
+                <button class="btn btn-sm" style="border-radius:10px;border:1.5px solid rgba(244,63,94,0.25);background:rgba(244,63,94,0.06);width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;"
+                    onclick="deleteCustomHoliday('${h.id}')" title="ลบ">
+                    <i class="fa-solid fa-trash-can" style="font-size:0.8rem;color:#f43f5e;"></i>
+                </button>
+            </div>`;
         list.appendChild(item);
     });
 }
@@ -229,17 +263,18 @@ window.editCustomHoliday = (id, date, name) => {
     document.getElementById('editHolidayId').value = id;
     document.getElementById('holidayDate').value = date;
     document.getElementById('holidayName').value = name;
-    document.getElementById('saveHolidayBtn').innerHTML = "<i class='fa-solid fa-check me-1'></i> อัปเดตวันหยุด";
+    document.getElementById('saveHolidayBtn').innerHTML = `<i class="fa-solid fa-check me-2"></i>อัปเดตวันหยุด`;
     document.getElementById('cancelEditHolidayBtn').classList.remove('d-none');
-    document.getElementById('holidayFormTitle').innerText = "แก้ไขวันหยุด";
+    document.getElementById('holidayFormTitle').innerHTML = `<i class="fa-solid fa-pen-to-square me-2"></i>แก้ไขวันหยุด`;
 };
 
 window.deleteCustomHoliday = async (id) => {
-    if(confirm("ยืนยันการลบวันหยุดนี้ออกจากระบบ?")) {
+    if (confirm("ยืนยันการลบวันหยุดนี้ออกจากระบบ?")) {
         await deleteDoc(doc(db, "customHolidays", id));
     }
 };
 
+// ─── Fast Add ─────────────────────────────────────────────────────────────────
 window.openFastAddModal = () => {
     const today = new Date();
     const localDate = new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
@@ -249,11 +284,9 @@ window.openFastAddModal = () => {
 
 window.startFastAdd = () => {
     const dateVal = document.getElementById('fastAddStartDate').value;
-    if(!dateVal) return alert('กรุณาเลือกวันเริ่มต้นลงเวร');
-    
+    if (!dateVal) return alert('กรุณาเลือกวันเริ่มต้นลงเวร');
     const parts = dateVal.split('-');
     fastAddCurrentDate = new Date(parts[0], parts[1] - 1, parts[2]);
-
     bootstrap.Modal.getInstance(document.getElementById('fastAddDateModal')).hide();
     isFastAddMode = true;
     document.getElementById('fastAddBar').classList.remove('d-none');
@@ -263,15 +296,14 @@ window.startFastAdd = () => {
 
 window.toggleFastAdd = (show) => {
     isFastAddMode = show;
-    const bar = document.getElementById('fastAddBar');
-    if(!show) bar.classList.add('d-none');
+    if (!show) document.getElementById('fastAddBar').classList.add('d-none');
 };
 
 function updateFastAddLabel() {
     const label = document.getElementById('fastAddDateLabel');
-    if(label) {
-        label.innerText = fastAddCurrentDate.toLocaleDateString('th-TH', { 
-            day: 'numeric', month: 'long', year: 'numeric' 
+    if (label) {
+        label.innerText = fastAddCurrentDate.toLocaleDateString('th-TH', {
+            day: 'numeric', month: 'long', year: 'numeric'
         });
     }
 }
@@ -279,299 +311,354 @@ function updateFastAddLabel() {
 async function handleFastAdd(typeData) {
     const localDate = new Date(fastAddCurrentDate.getTime() - (fastAddCurrentDate.getTimezoneOffset() * 60000));
     const dateStr = localDate.toISOString().split('T')[0];
-    
     await addDoc(collection(db, "shifts"), {
         date: dateStr, name: typeData.name, color: typeData.color,
         time: typeData.hasTime ? `${typeData.start}-${typeData.end}` : "", note: ""
     });
-
     fastAddCurrentDate.setDate(fastAddCurrentDate.getDate() + 1);
     updateFastAddLabel();
 }
 
+// ─── Settings View (Shift Types) ─────────────────────────────────────────────
 function initSettingsView() {
-    const saveTypeBtn = document.getElementById('saveTypeBtn');
-    
-    saveTypeBtn.addEventListener('click', async () => {
-        const toggleTime = document.getElementById('toggleTime');
-        const typeName = document.getElementById('typeName');
-        const typeColor = document.getElementById('typeColor');
-        
+    // Live preview
+    const typeNameInput = document.getElementById('typeName');
+    const typeColorInput = document.getElementById('typeColor');
+    const previewEl = document.getElementById('previewEvent');
+    const toggleTime = document.getElementById('toggleTime');
+    const timeSection = document.getElementById('timeInputSection');
+
+    typeNameInput.addEventListener('input', () => {
+        previewEl.innerText = typeNameInput.value || 'ชื่อเวร';
+    });
+    typeColorInput.addEventListener('input', () => {
+        previewEl.style.background = typeColorInput.value;
+        previewEl.style.boxShadow = `0 4px 14px ${typeColorInput.value}55`;
+    });
+    toggleTime.addEventListener('change', () => {
+        timeSection.style.display = toggleTime.checked ? 'block' : 'none';
+    });
+
+    document.getElementById('saveTypeBtn').addEventListener('click', async () => {
         const data = {
-            name: typeName.value, color: typeColor.value, hasTime: toggleTime.checked,
+            name: typeNameInput.value, color: typeColorInput.value, hasTime: toggleTime.checked,
             start: toggleTime.checked ? document.getElementById('startTime').value : "",
             end: toggleTime.checked ? document.getElementById('endTime').value : ""
         };
-        if(!data.name) return alert("โปรดระบุชื่อเวร");
-        
+        if (!data.name) return alert("โปรดระบุชื่อเวร");
         await addDoc(collection(db, "shiftTypes"), data);
-        typeName.value = "";
+        typeNameInput.value = "";
+        previewEl.innerText = 'ชื่อเวร';
         alert("เพิ่มประเภทเวรสำเร็จ");
     });
 
     onSnapshot(collection(db, "shiftTypes"), (snapshot) => {
         const list = document.getElementById('shiftTypeList');
-        const modalButtons = document.getElementById('modalShiftButtons'); 
-        const fastAddButtons = document.getElementById('fastAddButtons'); 
-        
+        const modalButtons = document.getElementById('modalShiftButtons');
+        const fastAddButtons = document.getElementById('fastAddButtons');
+
         list.innerHTML = "";
-        if(modalButtons) modalButtons.innerHTML = "";
-        if(fastAddButtons) fastAddButtons.innerHTML = "";
-        shiftTypesList = []; 
-        
+        if (modalButtons) modalButtons.innerHTML = "";
+        if (fastAddButtons) fastAddButtons.innerHTML = "";
+        shiftTypesList = [];
+
+        if (snapshot.empty) {
+            list.innerHTML = `
+                <div class="text-center py-5 text-muted">
+                    <i class="fa-solid fa-layer-group fs-2 mb-3 d-block" style="color:rgba(99,102,241,0.25);"></i>
+                    <span class="small fw-medium">ยังไม่มีประเภทเวร กรุณาเพิ่มด้านซ้าย</span>
+                </div>`;
+        }
+
         snapshot.forEach(docSnap => {
             const t = docSnap.data();
             const id = docSnap.id;
             shiftTypesList.push({ id, ...t });
-            
-            // [UI อัปเกรด] ปรับปรุงรายการประเภทเวร
+
+            // ── Shift Type List Item ──────────────────────────────────
             const item = document.createElement('div');
-            item.className = "list-group-item d-flex justify-content-between align-items-center mb-3 shadow-sm rounded-4 bg-white border border-light p-3";
+            item.className = "list-group-item d-flex justify-content-between align-items-center";
             item.innerHTML = `
                 <div class="d-flex align-items-center gap-3">
-                    <div style="width: 24px; height: 24px; border-radius: 50%; background-color: ${t.color}; box-shadow: 0 4px 8px ${t.color}60; border: 2px solid white;"></div>
-                    <span class="fw-bold fs-6 text-dark">${t.name}</span> 
-                    ${t.hasTime ? `<span class="badge bg-light text-secondary border rounded-pill px-3 py-2 fw-medium ms-2"><i class="fa-regular fa-clock me-1"></i>${t.start} - ${t.end}</span>` : ""}
+                    <div class="shift-color-dot" style="background:${t.color};box-shadow:0 3px 10px ${t.color}55;"></div>
+                    <div>
+                        <span class="fw-bold" style="font-size:0.95rem;">${t.name}</span>
+                        ${t.hasTime
+                            ? `<span class="d-block small mt-1" style="color:#94a3b8;"><i class="fa-regular fa-clock me-1"></i>${t.start} – ${t.end}</span>`
+                            : `<span class="d-block small mt-1" style="color:#94a3b8;">ไม่ระบุเวลา</span>`}
+                    </div>
                 </div>
-                <button class="btn btn-sm btn-outline-danger rounded-pill px-3 shadow-sm" onclick="deleteType('${id}')" title="ลบประเภทเวร"><i class="fa-solid fa-trash-can"></i></button>
-            `;
+                <button class="btn btn-sm" style="border-radius:10px;border:1.5px solid rgba(244,63,94,0.25);background:rgba(244,63,94,0.06);width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;"
+                    onclick="deleteType('${id}')" title="ลบประเภทเวร">
+                    <i class="fa-solid fa-trash-can" style="font-size:0.8rem;color:#f43f5e;"></i>
+                </button>`;
             list.appendChild(item);
 
-            if(fastAddButtons) {
+            // ── Fast Add Buttons ──────────────────────────────────────
+            if (fastAddButtons) {
                 const btnFast = document.createElement('button');
-                btnFast.className = "btn text-white fw-bold text-nowrap rounded-pill px-4 py-2 shadow-sm border border-light";
-                btnFast.style.backgroundColor = t.color;
+                btnFast.className = "btn text-white fw-bold text-nowrap";
+                btnFast.style.cssText = `
+                    background:${t.color};
+                    border-radius:50px;
+                    padding:0.55rem 1.4rem;
+                    border:none;
+                    box-shadow:0 4px 14px ${t.color}55;
+                    font-size:0.88rem;
+                    letter-spacing:0.3px;
+                    transition:all 0.2s ease;
+                `;
                 btnFast.innerText = t.name;
+                btnFast.onmouseover = () => { btnFast.style.transform = 'translateY(-2px)'; btnFast.style.filter = 'brightness(1.1)'; };
+                btnFast.onmouseout = () => { btnFast.style.transform = ''; btnFast.style.filter = ''; };
                 btnFast.onclick = () => handleFastAdd(t);
                 fastAddButtons.appendChild(btnFast);
             }
 
-            if(modalButtons) {
+            // ── Modal Shift Buttons ───────────────────────────────────
+            if (modalButtons) {
                 const btnModal = document.createElement('button');
-                btnModal.className = "btn text-white fw-bold shift-btn rounded-pill px-4 py-2 shadow-sm border border-light m-1";
-                btnModal.style.backgroundColor = t.color;
-                btnModal.style.opacity = "0.5"; // ปรับ Opacity ให้ซอฟต์ลงตอนยังไม่กด
+                btnModal.className = "btn text-white fw-bold shift-btn";
+                btnModal.style.cssText = `
+                    background:${t.color};
+                    border-radius:50px;
+                    padding:0.55rem 1.4rem;
+                    border:2px solid transparent;
+                    opacity:0.55;
+                    font-size:0.88rem;
+                    letter-spacing:0.3px;
+                    transition:all 0.25s cubic-bezier(0.4,0,0.2,1);
+                    box-shadow:0 4px 14px ${t.color}33;
+                `;
                 btnModal.innerText = t.name;
-                
                 btnModal.onclick = () => {
-                    document.querySelectorAll('.shift-btn').forEach(b => b.style.opacity = "0.5");
-                    btnModal.style.opacity = "1";
-                    // เพิ่มคลาสเน้นกรอบตอนที่ถูกเลือก
-                    document.querySelectorAll('.shift-btn').forEach(b => b.classList.remove('border-dark', 'border-2'));
-                    btnModal.classList.add('border-dark', 'border-2');
-                    currentSelectedShiftType = { id, ...t }; 
+                    document.querySelectorAll('.shift-btn').forEach(b => {
+                        b.style.opacity = '0.55';
+                        b.style.transform = '';
+                        b.style.borderColor = 'transparent';
+                        b.style.boxShadow = `0 4px 14px ${t.color}33`;
+                    });
+                    btnModal.style.opacity = '1';
+                    btnModal.style.transform = 'scale(1.06)';
+                    btnModal.style.borderColor = 'rgba(255,255,255,0.6)';
+                    btnModal.style.boxShadow = `0 8px 24px ${t.color}66`;
+                    currentSelectedShiftType = { id, ...t };
                 };
                 modalButtons.appendChild(btnModal);
             }
         });
-        if(calendar) updateSidebarSummary(calendar.view.currentStart);
+
+        if (calendar) updateSidebarSummary(calendar.view.currentStart);
     });
 }
 
 window.deleteType = async (id) => {
-    if(confirm("คุณยืนยันที่จะลบประเภทเวรนี้ใช่หรือไม่?")) await deleteDoc(doc(db, "shiftTypes", id));
+    if (confirm("คุณยืนยันที่จะลบประเภทเวรนี้ใช่หรือไม่?")) {
+        await deleteDoc(doc(db, "shiftTypes", id));
+    }
 };
 
+// ─── Calendar ─────────────────────────────────────────────────────────────────
 function initCalendarView() {
     const calendarEl = document.getElementById('calendar');
     calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'th',
         firstDay: currentFirstDay,
-        headerToolbar: { 
-            left: 'prev,next today', 
-            center: 'title', 
-            right: 'dayGridMonth,listMonth' 
-        },
-        height: 'auto', // ช่วยให้ปฏิทินแสดงผลได้เต็มที่ไม่โดนตัด
-        dayMaxEvents: true, // แสดงปุ่ม +more ถ้ารายการเยอะเกิน
-        dateClick: function(info) {
+        headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,listMonth' },
+        height: 'auto',
+        dayMaxEvents: true,
+        dateClick: function (info) {
             currentSelectedDate = info.dateStr;
             document.getElementById('modalDateLabel').innerText = info.dateStr;
             document.querySelectorAll('.shift-btn').forEach(b => {
-                b.style.opacity = "0.5";
-                b.classList.remove('border-dark', 'border-2');
+                b.style.opacity = '0.55';
+                b.style.transform = '';
+                b.style.borderColor = 'transparent';
             });
-            currentSelectedShiftType = null; 
+            currentSelectedShiftType = null;
             document.getElementById('modalNote').value = "";
             new bootstrap.Modal(document.getElementById('addEventModal')).show();
         },
         datesSet: (info) => updateSidebarSummary(info.view.currentStart),
-        events: function(info, successCallback) {
-            const apiEvents = allHolidays.map(h => ({ 
-                start: h.date, title: `🇹🇭 ${h.localName}`, allDay: true, 
-                display: 'block', backgroundColor: '#fff0f0', borderColor: '#ffcccc', textColor: '#d93025',
-                className: 'holiday-event rounded-2 px-1 mb-1 shadow-sm border', extendedProps: { isHoliday: true }
+        events: function (info, successCallback) {
+            const apiEvents = allHolidays.map(h => ({
+                start: h.date, title: `🇹🇭 ${h.localName}`, allDay: true,
+                display: 'block',
+                backgroundColor: 'rgba(244,63,94,0.08)',
+                borderColor: 'rgba(244,63,94,0.3)',
+                textColor: '#e11d48',
+                className: 'holiday-event',
+                extendedProps: { isHoliday: true }
             }));
-            
-            const customEvents = customHolidaysData.map(h => ({ 
-                start: h.date, title: `🌴 ${h.name}`, allDay: true, 
-                display: 'block', backgroundColor: '#f0f8ff', borderColor: '#b3e0ff', textColor: '#0066cc',
-                className: 'holiday-event rounded-2 px-1 mb-1 shadow-sm border', extendedProps: { isHoliday: true }
+
+            const customEvents = customHolidaysData.map(h => ({
+                start: h.date, title: `🌴 ${h.name}`, allDay: true,
+                display: 'block',
+                backgroundColor: 'rgba(99,102,241,0.08)',
+                borderColor: 'rgba(99,102,241,0.3)',
+                textColor: '#4338ca',
+                className: 'holiday-event',
+                extendedProps: { isHoliday: true }
             }));
 
             const shiftEvents = allShiftsData.map(d => ({
-                id: d.id, title: d.name, start: d.date, 
-                backgroundColor: d.color, borderColor: 'transparent', // เอาเส้นขอบออกให้สีเนียนขึ้น
-                className: 'rounded-2 px-2 py-1 mb-1 shadow-sm text-white fw-bold', // เพิ่มเงาและปรับฟอนต์เวร
+                id: d.id, title: d.name, start: d.date,
+                backgroundColor: d.color,
+                borderColor: 'transparent',
+                textColor: '#ffffff',
                 extendedProps: { shiftId: d.id, note: d.note || "", isHoliday: false }
             }));
-            
+
             successCallback([...apiEvents, ...customEvents, ...shiftEvents]);
         },
-        eventClick: async function(info) {
-            if(info.event.extendedProps.isHoliday) return; 
-            
+        eventClick: async function (info) {
+            if (info.event.extendedProps.isHoliday) return;
             const noteText = info.event.extendedProps.note ? `\n\n📝 โน้ต: ${info.event.extendedProps.note}` : "";
-            if(confirm(`เวร: ${info.event.title}${noteText}\n\nต้องการลบเวรนี้ออกจากปฏิทินใช่หรือไม่?`)) {
+            if (confirm(`เวร: ${info.event.title}${noteText}\n\nต้องการลบเวรนี้ออกจากปฏิทินใช่หรือไม่?`)) {
                 await deleteDoc(doc(db, "shifts", info.event.extendedProps.shiftId));
             }
         }
     });
     calendar.render();
-    
     window.calendarInstance = calendar;
 }
 
 document.getElementById('modalSaveBtn').addEventListener('click', async () => {
-    if(!currentSelectedShiftType) return alert("กรุณาเลือกประเภทเวรก่อนทำการบันทึก");
-    const noteInput = document.getElementById('modalNote').value;
-    
+    if (!currentSelectedShiftType) return alert("กรุณาเลือกประเภทเวรก่อนทำการบันทึก");
     await addDoc(collection(db, "shifts"), {
-        date: currentSelectedDate, name: currentSelectedShiftType.name,
+        date: currentSelectedDate,
+        name: currentSelectedShiftType.name,
         color: currentSelectedShiftType.color,
         time: currentSelectedShiftType.hasTime ? `${currentSelectedShiftType.start}-${currentSelectedShiftType.end}` : "",
-        note: noteInput
+        note: document.getElementById('modalNote').value
     });
     bootstrap.Modal.getInstance(document.getElementById('addEventModal')).hide();
 });
 
-// ฟังก์ชันตกแต่งสีสันสรุปยอดเวร
+// ─── Sidebar Summary ──────────────────────────────────────────────────────────
 function updateSidebarSummary(startDate) {
-    if(!startDate) return;
+    if (!startDate) return;
     const m = startDate.getMonth();
     const y = startDate.getFullYear();
     const summary = {};
-    
-    shiftTypesList.forEach(type => { 
-        summary[type.name] = { count: 0, color: type.color }; 
-    });
-    
+
+    shiftTypesList.forEach(type => { summary[type.name] = { count: 0, color: type.color }; });
     allShiftsData.forEach(data => {
         const dDate = new Date(data.date);
-        if(dDate.getMonth() === m && dDate.getFullYear() === y) {
-            if(summary[data.name]) {
-                summary[data.name].count++;
-            } else {
-                summary[data.name] = { count: 1, color: data.color || '#6c757d' };
-            }
+        if (dDate.getMonth() === m && dDate.getFullYear() === y) {
+            if (summary[data.name]) summary[data.name].count++;
+            else summary[data.name] = { count: 1, color: data.color || '#6c757d' };
         }
     });
 
     const sumBox = document.getElementById('summaryList');
-    if(sumBox) {
-        sumBox.innerHTML = "";
-        Object.keys(summary).forEach(key => {
-            const s = summary[key];
-            if (s.count > 0) { 
-                // [UI อัปเกรด] ปรับการ์ดสรุปยอดเวรให้ดูน่าอ่าน คล้าย Dashboard Cards
-                sumBox.innerHTML += `
-                    <div class="d-flex justify-content-between align-items-center mb-3 p-3 rounded-4 shadow-sm bg-white" style="border-left: 6px solid ${s.color};">
-                        <div class="d-flex align-items-center gap-3">
-                            <div style="width: 14px; height: 14px; border-radius: 50%; background-color: ${s.color}; box-shadow: 0 0 6px ${s.color}80;"></div>
-                            <span class="fw-bold text-dark fs-6">${key}</span> 
-                        </div>
-                        <span class="badge rounded-pill text-white shadow-sm px-3 py-2 fs-6" style="background-color: ${s.color};">${s.count} เวร</span>
-                    </div>`;
-            }
-        });
-        if (sumBox.innerHTML === "") {
+    if (sumBox) {
+        const entries = Object.entries(summary).filter(([, s]) => s.count > 0);
+        if (entries.length === 0) {
             sumBox.innerHTML = `
-                <div class="text-muted text-center small py-4 bg-light rounded-4 border border-dashed shadow-sm">
-                    <i class="fa-solid fa-calendar-xmark mb-3 fs-3 text-secondary opacity-50"></i><br>
-                    <span class="fw-medium">เดือนนี้ยังไม่มีเวร</span>
+                <div class="text-center py-4">
+                    <i class="fa-solid fa-calendar-xmark fs-3 mb-2 d-block" style="color:rgba(99,102,241,0.2);"></i>
+                    <span class="small fw-medium" style="color:#94a3b8;">เดือนนี้ยังไม่มีเวร</span>
                 </div>`;
+        } else {
+            sumBox.innerHTML = entries.map(([key, s]) => `
+                <div class="d-flex justify-content-between align-items-center mb-2 px-3 py-2 rounded-3"
+                     style="background:${s.color}0d;border-left:3px solid ${s.color};">
+                    <div class="d-flex align-items-center gap-2">
+                        <div style="width:10px;height:10px;border-radius:50%;background:${s.color};box-shadow:0 2px 6px ${s.color}66;flex-shrink:0;"></div>
+                        <span class="fw-semibold" style="font-size:0.88rem;color:#1e1b4b;">${key}</span>
+                    </div>
+                    <span class="fw-bold rounded-pill px-3 py-1 text-white" 
+                          style="background:${s.color};font-size:0.8rem;box-shadow:0 3px 10px ${s.color}44;">
+                        ${s.count}
+                    </span>
+                </div>`).join('');
         }
     }
 
+    // ── Holiday sidebar ───────────────────────────────────────────────────────
     const holBox = document.getElementById('holidayList');
-    if(holBox) {
+    if (holBox) {
         holBox.innerHTML = "";
+
         allHolidays.forEach(h => {
             const hDate = new Date(h.date);
-            if(hDate.getMonth() === m && hDate.getFullYear() === y) {
+            if (hDate.getMonth() === m && hDate.getFullYear() === y) {
                 holBox.innerHTML += `
-                <div class="d-flex align-items-center py-2 px-3 mb-2 rounded-3 bg-danger bg-opacity-10 border border-danger border-opacity-25">
-                    <span class="text-danger small fw-medium"><i class="fa-regular fa-flag me-2"></i>${hDate.getDate()} - ${h.localName}</span>
-                </div>`;
+                    <li class="list-group-item border-0 px-0 py-1">
+                        <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-3"
+                             style="background:rgba(244,63,94,0.06);border-left:3px solid rgba(244,63,94,0.5);">
+                            <span style="font-size:0.82rem;color:#e11d48;font-weight:600;">
+                                <i class="fa-solid fa-flag me-1" style="font-size:0.75rem;"></i>
+                                ${hDate.getDate()} ${hDate.toLocaleDateString('th-TH',{month:'short'})} – ${h.localName}
+                            </span>
+                        </div>
+                    </li>`;
             }
         });
+
         customHolidaysData.forEach(h => {
             const hDate = new Date(h.date);
-            if(hDate.getMonth() === m && hDate.getFullYear() === y) {
+            if (hDate.getMonth() === m && hDate.getFullYear() === y) {
                 holBox.innerHTML += `
-                <div class="d-flex align-items-center py-2 px-3 mb-2 rounded-3 bg-primary bg-opacity-10 border border-primary border-opacity-25">
-                    <span class="text-primary small fw-medium"><i class="fa-solid fa-umbrella-beach me-2"></i>${hDate.getDate()} - ${h.name}</span>
-                </div>`;
+                    <li class="list-group-item border-0 px-0 py-1">
+                        <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-3"
+                             style="background:rgba(99,102,241,0.06);border-left:3px solid rgba(99,102,241,0.4);">
+                            <span style="font-size:0.82rem;color:#4338ca;font-weight:600;">
+                                <i class="fa-solid fa-umbrella-beach me-1" style="font-size:0.75rem;"></i>
+                                ${hDate.getDate()} ${hDate.toLocaleDateString('th-TH',{month:'short'})} – ${h.name}
+                            </span>
+                        </div>
+                    </li>`;
             }
         });
+
         if (holBox.innerHTML === "") {
-            holBox.innerHTML = `<div class="text-muted text-center small my-3 py-2 bg-light rounded-3 border">ไม่มีวันหยุดในเดือนนี้</div>`;
+            holBox.innerHTML = `
+                <li class="list-group-item border-0 px-0">
+                    <div class="text-center py-3 rounded-3" style="background:rgba(99,102,241,0.04);">
+                        <span class="small fw-medium" style="color:#94a3b8;">ไม่มีวันหยุดในเดือนนี้</span>
+                    </div>
+                </li>`;
         }
     }
 }
 
-// ==========================================
-// ส่วนของการส่งออก (Export Features)
-// ==========================================
-
+// ─── Export ───────────────────────────────────────────────────────────────────
 window.exportToImage = async () => {
     const targetElement = document.getElementById('calendarCaptureArea');
-    const originalShadow = targetElement.style.boxShadow;
-    
+    const original = targetElement.style.boxShadow;
     targetElement.style.boxShadow = 'none';
-    
     try {
         const canvas = await html2canvas(targetElement, { scale: 2 });
         const link = document.createElement('a');
         link.download = `ตารางเวรรังสี_${new Date().toLocaleDateString('th-TH').replace(/\//g, '-')}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
-    } catch (err) {
-        alert("เกิดข้อผิดพลาดในการบันทึกรูปภาพ: " + err);
-    }
-    
-    targetElement.style.boxShadow = originalShadow;
+    } catch (err) { alert("เกิดข้อผิดพลาดในการบันทึกรูปภาพ: " + err); }
+    targetElement.style.boxShadow = original;
 };
 
 window.exportToICal = () => {
-    let icsContent = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Radiology Shift Pro//TH\n";
-    
+    let ics = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Radiology Shift Pro//TH\n";
     allShiftsData.forEach(shift => {
-        const dateObj = new Date(shift.date);
-        const dtStart = dateObj.toISOString().split('T')[0].replace(/-/g, '');
-        
-        dateObj.setDate(dateObj.getDate() + 1);
-        const dtEnd = dateObj.toISOString().split('T')[0].replace(/-/g, '');
-        
-        icsContent += "BEGIN:VEVENT\n";
-        icsContent += `DTSTART;VALUE=DATE:${dtStart}\n`;
-        icsContent += `DTEND;VALUE=DATE:${dtEnd}\n`;
-        icsContent += `SUMMARY:เวร ${shift.name}\n`;
-        if(shift.time || shift.note) {
+        const d = new Date(shift.date);
+        const dtStart = d.toISOString().split('T')[0].replace(/-/g, '');
+        d.setDate(d.getDate() + 1);
+        const dtEnd = d.toISOString().split('T')[0].replace(/-/g, '');
+        ics += `BEGIN:VEVENT\nDTSTART;VALUE=DATE:${dtStart}\nDTEND;VALUE=DATE:${dtEnd}\nSUMMARY:เวร ${shift.name}\n`;
+        if (shift.time || shift.note) {
             let desc = "";
-            if(shift.time) desc += `เวลา: ${shift.time} `;
-            if(shift.note) desc += `(โน้ต: ${shift.note})`;
-            icsContent += `DESCRIPTION:${desc.trim()}\n`;
+            if (shift.time) desc += `เวลา: ${shift.time} `;
+            if (shift.note) desc += `(โน้ต: ${shift.note})`;
+            ics += `DESCRIPTION:${desc.trim()}\n`;
         }
-        icsContent += "END:VEVENT\n";
+        ics += "END:VEVENT\n";
     });
-    
-    icsContent += "END:VCALENDAR";
-    
-    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    ics += "END:VCALENDAR";
     const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
+    link.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
     link.download = 'radiology_shifts.ics';
     document.body.appendChild(link);
     link.click();

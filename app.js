@@ -487,7 +487,7 @@ function updateSidebarSummary(startDate) {
         });
         if (sumBox.innerHTML === "") {
             sumBox.innerHTML = `
-                <div class="text-muted text-center small my-4 py-4 bg-light rounded-4 border border-dashed shadow-sm">
+                <div class="text-muted text-center small py-4 bg-light rounded-4 border border-dashed shadow-sm">
                     <i class="fa-solid fa-calendar-xmark mb-3 fs-3 text-secondary opacity-50"></i><br>
                     <span class="fw-medium">เดือนนี้ยังไม่มีเวร</span>
                 </div>`;

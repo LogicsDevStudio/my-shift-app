@@ -15,6 +15,25 @@
         .fc-event { cursor: pointer; border: none !important; padding: 2px 4px; border-radius: 4px; }
         .fc-toolbar-title { font-size: 1.25rem !important; font-weight: 600; }
         .summary-box { font-size: 1.5rem; font-weight: bold; }
+        /* เพิ่มเอฟเฟกต์ให้การ์ดเมนูเวลากดหรือเอาเมาส์ชี้ */
+        .menu-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-radius: 16px;
+            background-color: white;
+        }
+        .menu-card:hover, .menu-card:active {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+            background-color: #f0f4ff;
+        }
+        .menu-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        .btn-close-lg {
+            width: 2em;
+            height: 2em;
+        }
     </style>
 </head>
 <body>
@@ -28,17 +47,72 @@
         </div>
     </nav>
 
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
-        <div class="offcanvas-header border-bottom">
-            <h5 class="offcanvas-title fw-bold" id="sidebarMenuLabel">เมนูระบบ</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    <div class="offcanvas offcanvas-top h-100" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+        <div class="offcanvas-header border-bottom shadow-sm px-4">
+            <h4 class="offcanvas-title fw-bold text-primary" id="sidebarMenuLabel">เมนูหลัก (Main Menu)</h4>
+            <button type="button" class="btn-close btn-close-lg" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        <div class="offcanvas-body">
-            <div class="list-group list-group-flush">
-                <a href="#" class="list-group-item list-group-item-action active">📅 ปฏิทินเวร (หน้าแรก)</a>
-                <a href="#" class="list-group-item list-group-item-action">👥 รายชื่อเพื่อนร่วมงาน</a>
-                <a href="#" class="list-group-item list-group-item-action">📊 สถิติการปฏิบัติงาน</a>
-                <a href="#" class="list-group-item list-group-item-action">⚙️ ตั้งค่าระบบ</a>
+        
+        <div class="offcanvas-body" style="background-color: #f4f4f7;">
+            <div class="container mt-3 max-w-900" style="max-width: 900px; margin: 0 auto;">
+                <div class="row g-3">
+                    
+                    <div class="col-6 col-md-4">
+                        <a href="#" class="text-decoration-none" data-bs-dismiss="offcanvas">
+                            <div class="card menu-card text-center h-100 shadow-sm border-0">
+                                <div class="card-body py-4">
+                                    <div class="menu-icon">📅</div>
+                                    <h6 class="text-dark fw-bold mb-0">ปฏิทินเวร</h6>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-6 col-md-4">
+                        <a href="#" class="text-decoration-none">
+                            <div class="card menu-card text-center h-100 shadow-sm border-0">
+                                <div class="card-body py-4">
+                                    <div class="menu-icon">⚙️</div>
+                                    <h6 class="text-dark fw-bold mb-0">ตั้งค่าเวร</h6>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-6 col-md-4">
+                        <a href="#" class="text-decoration-none">
+                            <div class="card menu-card text-center h-100 shadow-sm border-0">
+                                <div class="card-body py-4">
+                                    <div class="menu-icon">🔤</div>
+                                    <h6 class="text-dark fw-bold mb-0">เปลี่ยนฟอนต์</h6>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-6 col-md-4">
+                        <a href="#" class="text-decoration-none">
+                            <div class="card menu-card text-center h-100 shadow-sm border-0">
+                                <div class="card-body py-4">
+                                    <div class="menu-icon">🛠️</div>
+                                    <h6 class="text-dark fw-bold mb-0">ตั้งค่าระบบ</h6>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-6 col-md-4">
+                        <a href="#" class="text-decoration-none">
+                            <div class="card menu-card text-center h-100 shadow-sm border-0">
+                                <div class="card-body py-4">
+                                    <div class="menu-icon">📊</div>
+                                    <h6 class="text-dark fw-bold mb-0">สถิติ/รายงาน</h6>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>

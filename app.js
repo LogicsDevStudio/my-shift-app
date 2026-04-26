@@ -16,10 +16,9 @@ const db = getFirestore(app);
 document.addEventListener('DOMContentLoaded', async function() {
     const calendarEl = document.getElementById('calendar');
     
-    // สร้างตัวแปรปฏิทิน
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
-        locale: 'th', // ตั้งค่าภาษาไทย
+        locale: 'th',
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
@@ -28,18 +27,28 @@ document.addEventListener('DOMContentLoaded', async function() {
         events: async function(info, successCallback, failureCallback) {
             try {
                 let allEvents = [];
+                let holidayEvents = [];
 
-                // 1. ดึงข้อมูลวันหยุดจาก API (ปีปัจจุบัน)
-                const year = new Date().getFullYear();
-                const holidayRes = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/TH`);
-                const holidays = await holidayRes.json();
-                const holidayEvents = holidays.map(h => ({
-                    title: h.localName,
-                    start: h.date,
-                    display: 'background',
-                    color: '#ffcccc', // สีพื้นหลังวันหยุด
-                    textColor: '#ff0000'
-                }));
+                // 1. ดึงข้อมูลวันหยุด (เพิ่มระบบป้องกันปฏิทินล่ม หาก API ไม่มีข้อมูล)
+                try {
+                    const year = new Date().getFullYear();
+                    const holidayRes = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/TH`);
+                    
+                    if (holidayRes.ok) {
+                        const holidays = await holidayRes.json();
+                        if (Array.isArray(holidays)) {
+                            holidayEvents = holidays.map(h => ({
+                                title: h.localName,
+                                start: h.date,
+                                display: 'background',
+                                color: '#ffcccc',
+                                textColor: '#ff0000'
+                            }));
+                        }
+                    }
+                } catch (apiError) {
+                    console.warn("ไม่สามารถดึงข้อมูลวันหยุดได้ชั่วคราว:", apiError);
+                }
 
                 // 2. ดึงข้อมูลเวรจาก Firebase
                 const querySnapshot = await getDocs(collection(db, "shifts"));
@@ -53,11 +62,11 @@ document.addEventListener('DOMContentLoaded', async function() {
                     };
                 });
 
-                // รวมข้อมูลทั้งหมด
+                // รวมข้อมูลทั้งหมดส่งให้ปฏิทิน
                 allEvents = [...holidayEvents, ...shiftEvents];
                 successCallback(allEvents);
             } catch (error) {
-                console.error(error);
+                console.error("เกิดข้อผิดพลาดในการโหลดเวร:", error);
                 failureCallback(error);
             }
         },
@@ -83,6 +92,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         if (!date) return alert("กรุณาเลือกวันที่");
 
+        saveBtn.innerText = "กำลังบันทึก...";
+
         try {
             await addDoc(collection(db, "shifts"), {
                 date: date,
@@ -95,5 +106,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         } catch (e) {
             alert("Error: " + e);
         }
+
+        saveBtn.innerText = "บันทึกข้อมูลเข้าปฏิทิน";
     });
 });

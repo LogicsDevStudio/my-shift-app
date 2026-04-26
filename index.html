@@ -3,39 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบบันทึกเวรแผนกรังสี</title>
+    <title>ปฏิทินเวรรังสี ☢️</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
     <style>
-        body { font-family: sans-serif; max-width: 500px; margin: 20px auto; padding: 20px; }
-        .form-group { margin-bottom: 15px; }
-        input, select, button { padding: 10px; width: 100%; box-sizing: border-box; }
-        button { background-color: #007AFF; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        .shift-item { padding: 10px; border-bottom: 1px solid #ccc; margin-top: 10px; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; padding: 10px; background-color: #f4f4f7; }
+        #calendar { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 900px; margin: 0 auto; }
+        .form-section { max-width: 900px; margin: 20px auto; background: white; padding: 20px; border-radius: 12px; }
+        h2 { color: #333; text-align: center; }
+        .form-group { margin-bottom: 10px; }
+        input, select, button { padding: 12px; width: 100%; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; font-size: 16px; }
+        button { background-color: #007AFF; color: white; font-weight: bold; cursor: pointer; border: none; margin-top: 10px; }
+        /* ปรับแต่งสีของ Event ในปฏิทิน */
+        .fc-event { cursor: pointer; border: none !important; }
     </style>
 </head>
 <body>
 
-    <h2>บันทึกเวรปฏิบัติงาน ☢️</h2>
+    <h2>ปฏิทินเวรปฏิบัติงาน 🗓️</h2>
     
-    <div class="form-group">
-        <label>วันที่:</label>
-        <input type="date" id="dateInput">
+    <div id="calendar"></div>
+
+    <div class="form-section">
+        <h3>เพิ่มเวรใหม่</h3>
+        <div class="form-group">
+            <input type="date" id="dateInput">
+        </div>
+        <div class="form-group">
+            <select id="shiftInput">
+                <option value="เวรเช้า" data-color="#FF9F0A" data-time="08:00 - 16:00">☀️ เวรเช้า (08:00 - 16:00)</option>
+                <option value="เวรบ่าย" data-color="#32ADE6" data-time="16:00 - 00:00">🌤️ เวรบ่าย (16:00 - 00:00)</option>
+                <option value="เวรดึก" data-color="#5856D6" data-time="00:00 - 08:00">🌙 เวรดึก (00:00 - 08:00)</option>
+                <option value="On-Call" data-color="#FF3B30" data-time="24 ชม.">🚨 On-Call</option>
+            </select>
+        </div>
+        <button id="saveBtn">บันทึกข้อมูลเข้าปฏิทิน</button>
     </div>
-    
-    <div class="form-group">
-        <label>เวร:</label>
-        <select id="shiftInput">
-            <option value="เวรเช้า" data-color="#FF9F0A" data-time="08:00 - 16:00">เวรเช้า (08:00 - 16:00)</option>
-            <option value="เวรบ่าย" data-color="#32ADE6" data-time="16:00 - 00:00">เวรบ่าย (16:00 - 00:00)</option>
-            <option value="เวรดึก" data-color="#30D158" data-time="00:00 - 08:00">เวรดึก (00:00 - 08:00)</option>
-        </select>
-    </div>
-
-    <button id="saveBtn">บันทึกเวร</button>
-
-    <hr>
-
-    <h2>รายการเวรของคุณ</h2>
-    <div id="shiftList">กำลังโหลดข้อมูล...</div>
 
     <script type="module" src="app.js"></script>
 </body>

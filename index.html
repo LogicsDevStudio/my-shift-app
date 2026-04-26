@@ -110,6 +110,24 @@
                             <h6 class="fw-bold">ตั้งค่าระบบ</h6>
                         </div>
                     </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card shadow-sm py-4" onclick="exportToImage()" data-bs-dismiss="offcanvas">
+                            <div class="display-5 mb-2">🖼️</div>
+                            <h6 class="fw-bold">บันทึกรูปภาพ</h6>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card shadow-sm py-4" onclick="window.print()" data-bs-dismiss="offcanvas">
+                            <div class="display-5 mb-2">🖨️</div>
+                            <h6 class="fw-bold">พิมพ์ / PDF</h6>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card shadow-sm py-4" onclick="exportToICal()" data-bs-dismiss="offcanvas">
+                            <div class="display-5 mb-2">📲</div>
+                            <h6 class="fw-bold">ซิงก์ iCal</h6>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -120,23 +138,6 @@
         <section id="view-calendar" class="view-section active">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2">
                 <h4 class="fw-bold mb-0">ปฏิทินปฏิบัติงาน</h4>
-                
-                <div class="d-flex gap-2">
-                    <div class="dropdown">
-                        <button class="btn btn-outline-primary fw-bold dropdown-toggle bg-white" type="button" data-bs-toggle="dropdown">
-                            <i class="fa-solid fa-file-export me-1"></i> ส่งออก
-                        </button>
-                        <ul class="dropdown-menu shadow-sm border-0 rounded-3">
-                            <li><a class="dropdown-item py-2" href="#" onclick="exportToImage()"><i class="fa-solid fa-image me-2 text-success"></i> บันทึกเป็นรูปภาพ (PNG)</a></li>
-                            <li><a class="dropdown-item py-2" href="#" onclick="window.print()"><i class="fa-solid fa-file-pdf me-2 text-danger"></i> บันทึกเป็น PDF / พิมพ์</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item py-2" href="#" onclick="exportToICal()"><i class="fa-solid fa-calendar-days me-2 text-primary"></i> ซิงก์แอปปฏิทิน (iCal)</a></li>
-                        </ul>
-                    </div>
-                    <button class="btn btn-success fw-bold shadow-sm" onclick="openFastAddModal()">
-                        <i class="fa-solid fa-bolt me-1"></i> ระบุเวรด่วน
-                    </button>
-                </div>
             </div>
             
             <div id="todayStatusHighlight" class="alert alert-secondary shadow-sm fw-bold mb-3 d-flex align-items-center">

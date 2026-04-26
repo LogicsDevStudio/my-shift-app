@@ -1,82 +1,100 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-// ⚠️ นำ firebaseConfig ของคุณมาวางแทนที่ตรงนี้ทั้งหมด
 const firebaseConfig = {
-  apiKey: "AIzaSyC6mr7_SuaFlc9R_kv8y9lc6rfKkMVv4-U",
-  authDomain: "radiologyshift.firebaseapp.com",
-  projectId: "radiologyshift",
-  storageBucket: "radiologyshift.firebasestorage.app",
-  messagingSenderId: "1085770244333",
-  appId: "1:1085770244333:web:b7e635cb2f557bc26e6ce4"
+    // *** นำ Config ของคุณมาใส่ตรงนี้ ***
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
 };
 
-// เริ่มต้นการเชื่อมต่อ Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const saveBtn = document.getElementById('saveBtn');
-const shiftList = document.getElementById('shiftList');
-
-// ฟังก์ชันบันทึกข้อมูล
-saveBtn.addEventListener('click', async () => {
-    const date = document.getElementById('dateInput').value;
-    const shiftSelect = document.getElementById('shiftInput');
-    const shiftName = shiftSelect.value;
-    const shiftTime = shiftSelect.options[shiftSelect.selectedIndex].dataset.time;
-    const shiftColor = shiftSelect.options[shiftSelect.selectedIndex].dataset.color;
-
-    if (!date) {
-        alert("กรุณาเลือกวันที่");
-        return;
-    }
-
-    saveBtn.innerText = "กำลังบันทึก...";
+document.addEventListener('DOMContentLoaded', async function() {
+    const calendarEl = document.getElementById('calendar');
     
-    try {
-        await addDoc(collection(db, "shifts"), {
-            date: date,
-            shiftName: shiftName,
-            time: shiftTime,
-            bgColor: shiftColor,
-            timestamp: new Date()
-        });
-        alert("บันทึกเรียบร้อย!");
-        loadShifts(); // รีโหลดข้อมูลมาแสดงใหม่
-    } catch (e) {
-        console.error("Error adding document: ", e);
-        alert("เกิดข้อผิดพลาดในการบันทึก");
-    }
-    
-    saveBtn.innerText = "บันทึกเวร";
-});
+    // สร้างตัวแปรปฏิทิน
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'th', // ตั้งค่าภาษาไทย
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,listMonth'
+        },
+        events: async function(info, successCallback, failureCallback) {
+            try {
+                let allEvents = [];
 
-// ฟังก์ชันดึงข้อมูลมาแสดงผล
-async function loadShifts() {
-    shiftList.innerHTML = "กำลังโหลดข้อมูล...";
-    const q = query(collection(db, "shifts"), orderBy("date", "asc"));
-    
-    try {
-        const querySnapshot = await getDocs(q);
-        shiftList.innerHTML = "";
-        
-        if (querySnapshot.empty) {
-            shiftList.innerHTML = "ยังไม่มีข้อมูลเวร";
-            return;
+                // 1. ดึงข้อมูลวันหยุดจาก API (ปีปัจจุบัน)
+                const year = new Date().getFullYear();
+                const holidayRes = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/TH`);
+                const holidays = await holidayRes.json();
+                const holidayEvents = holidays.map(h => ({
+                    title: h.localName,
+                    start: h.date,
+                    display: 'background',
+                    color: '#ffcccc', // สีพื้นหลังวันหยุด
+                    textColor: '#ff0000'
+                }));
+
+                // 2. ดึงข้อมูลเวรจาก Firebase
+                const querySnapshot = await getDocs(collection(db, "shifts"));
+                const shiftEvents = querySnapshot.docs.map(doc => {
+                    const data = doc.data();
+                    return {
+                        title: data.shiftName,
+                        start: data.date,
+                        backgroundColor: data.bgColor,
+                        extendedProps: { time: data.time }
+                    };
+                });
+
+                // รวมข้อมูลทั้งหมด
+                allEvents = [...holidayEvents, ...shiftEvents];
+                successCallback(allEvents);
+            } catch (error) {
+                console.error(error);
+                failureCallback(error);
+            }
+        },
+        eventClick: function(info) {
+            if (info.event.extendedProps.time) {
+                alert(info.event.title + "\nเวลา: " + info.event.extendedProps.time);
+            } else {
+                alert(info.event.title);
+            }
         }
+    });
 
-        querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            const div = document.createElement('div');
-            div.className = 'shift-item';
-            div.innerHTML = `<strong>${data.date}</strong> : ${data.shiftName} (${data.time})`;
-            shiftList.appendChild(div);
-        });
-    } catch (e) {
-        console.error("Error loading documents: ", e);
-        shiftList.innerHTML = "เกิดข้อผิดพลาดในการโหลดข้อมูล";
-    }
-}
+    calendar.render();
 
-// เรียกใช้ฟังก์ชันโหลดข้อมูลทันทีเมื่อเปิดเว็บ
-loadShifts();
+    // ระบบบันทึกข้อมูล
+    const saveBtn = document.getElementById('saveBtn');
+    saveBtn.addEventListener('click', async () => {
+        const date = document.getElementById('dateInput').value;
+        const shiftSelect = document.getElementById('shiftInput');
+        const shiftName = shiftSelect.value;
+        const shiftTime = shiftSelect.options[shiftSelect.selectedIndex].dataset.time;
+        const shiftColor = shiftSelect.options[shiftSelect.selectedIndex].dataset.color;
+
+        if (!date) return alert("กรุณาเลือกวันที่");
+
+        try {
+            await addDoc(collection(db, "shifts"), {
+                date: date,
+                shiftName: shiftName,
+                time: shiftTime,
+                bgColor: shiftColor
+            });
+            alert("บันทึกสำเร็จ!");
+            calendar.refetchEvents(); // อัปเดตปฏิทินทันที
+        } catch (e) {
+            alert("Error: " + e);
+        }
+    });
+});

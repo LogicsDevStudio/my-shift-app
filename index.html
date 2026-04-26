@@ -21,7 +21,11 @@
         .summary-card { border-radius: 12px; border: none; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .view-section { display: none; }
         .view-section.active { display: block; }
-        .shift-btn { transition: opacity 0.2s; } /* สำหรับปุ่มเลือกเวร */
+        .shift-btn { transition: opacity 0.2s; }
+        
+        /* สไตล์สำหรับปุ่มเลือกวัน */
+        .day-btn { flex: 1; border-radius: 10px; font-weight: 500; transition: all 0.2s; }
+        .day-btn.active { background-color: #0d6efd; color: white; border-color: #0d6efd; transform: scale(1.05); box-shadow: 0 4px 8px rgba(13,110,253,0.3); }
     </style>
 </head>
 <body>
@@ -41,8 +45,7 @@
                 <h6 class="mb-0 fw-bold">🚀 โหมดลงเวรด่วน: <span id="fastAddDateLabel" class="text-primary"></span></h6>
                 <button class="btn btn-sm btn-outline-secondary" onclick="toggleFastAdd(false)">ปิดโหมดนี้</button>
             </div>
-            <div id="fastAddButtons" class="d-flex gap-2 overflow-auto pb-2">
-                </div>
+            <div id="fastAddButtons" class="d-flex gap-2 overflow-auto pb-2"></div>
         </div>
     </div>
 
@@ -69,26 +72,26 @@
         <div class="offcanvas-body bg-light">
             <div class="container mt-4">
                 <div class="row g-4 text-center">
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-md-4 col-lg-2">
                         <div class="card menu-card shadow-sm py-4" onclick="switchView('calendar')" data-bs-dismiss="offcanvas">
                             <div class="display-5 mb-2">📅</div>
                             <h6 class="fw-bold">ปฏิทินเวร</h6>
                         </div>
                     </div>
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-md-4 col-lg-2">
                         <div class="card menu-card shadow-sm py-4" onclick="switchView('settings')" data-bs-dismiss="offcanvas">
                             <div class="display-5 mb-2">⚙️</div>
                             <h6 class="fw-bold">ตั้งค่าเวร</h6>
                         </div>
                     </div>
-                    <div class="col-6 col-md-3">
-                        <div class="card menu-card shadow-sm py-4">
-                            <div class="display-5 mb-2">🔤</div>
-                            <h6 class="fw-bold">เปลี่ยนฟอนต์</h6>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card shadow-sm py-4" onclick="switchView('holidays')" data-bs-dismiss="offcanvas">
+                            <div class="display-5 mb-2">🌴</div>
+                            <h6 class="fw-bold">จัดการวันหยุด</h6>
                         </div>
                     </div>
-                    <div class="col-6 col-md-3">
-                        <div class="card menu-card shadow-sm py-4">
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card shadow-sm py-4" onclick="switchView('system')" data-bs-dismiss="offcanvas">
                             <div class="display-5 mb-2">🛠️</div>
                             <h6 class="fw-bold">ตั้งค่าระบบ</h6>
                         </div>
@@ -99,6 +102,7 @@
     </div>
 
     <div class="container mt-4 mb-5">
+        
         <section id="view-calendar" class="view-section active">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold mb-0">ปฏิทินปฏิบัติงาน</h4>
@@ -119,7 +123,7 @@
                         <div class="card-body" id="summaryList"></div>
                     </div>
                     <div class="card summary-card border-0">
-                        <div class="card-header bg-white border-0 fw-bold text-danger pt-3">🇹🇭 วันหยุดราชการ</div>
+                        <div class="card-header bg-white border-0 fw-bold text-danger pt-3">🇹🇭 วันหยุดประจำเดือน</div>
                         <ul class="list-group list-group-flush" id="holidayList"></ul>
                     </div>
                 </div>
@@ -131,7 +135,6 @@
                 <div class="col-md-6">
                     <div class="card shadow-sm border-0 mb-4 p-4 rounded-4">
                         <h4 class="fw-bold mb-4">จัดการประเภทเวร</h4>
-                        <input type="hidden" id="editTypeId">
                         <div class="mb-3">
                             <label class="form-label small fw-bold">ชื่อเวร (เช่น เช้า, บ่าย, ดึก)</label>
                             <input type="text" id="typeName" class="form-control rounded-3" placeholder="ระบุชื่อเวร">
@@ -173,6 +176,59 @@
                 </div>
             </div>
         </section>
+
+        <section id="view-holidays" class="view-section">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0 mb-4 p-4 rounded-4">
+                        <h4 class="fw-bold mb-4" id="holidayFormTitle">เพิ่มวันหยุดใหม่</h4>
+                        <input type="hidden" id="editHolidayId">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">วันที่หยุด</label>
+                            <input type="date" id="holidayDate" class="form-control rounded-3">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">ชื่อวันหยุด / เทศกาล</label>
+                            <input type="text" id="holidayName" class="form-control rounded-3" placeholder="เช่น วันปีใหม่, วันหยุดพิเศษ">
+                        </div>
+                        <div class="d-flex gap-2 mt-4">
+                            <button class="btn btn-danger w-100 py-2 fw-bold d-none" id="cancelEditHolidayBtn">ยกเลิกแก้ไข</button>
+                            <button class="btn btn-primary w-100 py-2 fw-bold" id="saveHolidayBtn">บันทึกวันหยุด</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0 p-4 rounded-4">
+                        <h5 class="fw-bold mb-3 text-secondary">รายการวันหยุดที่กำหนดเอง</h5>
+                        <div id="customHolidayList" class="list-group list-group-flush"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-system" class="view-section">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card shadow-sm border-0 mb-4 p-4 rounded-4">
+                        <h4 class="fw-bold mb-4">ตั้งค่าระบบและปฏิทิน</h4>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold mb-3">เลือกวันเริ่มต้นของสัปดาห์</label>
+                            <div class="d-flex flex-wrap gap-2" id="dayOfWeekSelector">
+                                <button class="btn btn-outline-secondary day-btn" data-day="0">อาทิตย์</button>
+                                <button class="btn btn-outline-secondary day-btn" data-day="1">จันทร์</button>
+                                <button class="btn btn-outline-secondary day-btn" data-day="2">อังคาร</button>
+                                <button class="btn btn-outline-secondary day-btn" data-day="3">พุธ</button>
+                                <button class="btn btn-outline-secondary day-btn" data-day="4">พฤหัสฯ</button>
+                                <button class="btn btn-outline-secondary day-btn" data-day="5">ศุกร์</button>
+                                <button class="btn btn-outline-secondary day-btn" data-day="6">เสาร์</button>
+                            </div>
+                            <small class="text-muted mt-2 d-block">* การตั้งค่านี้จะเปลี่ยนการแสดงผลในหน้าปฏิทินทันที</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 
     <div class="modal fade" id="addEventModal" tabindex="-1">
@@ -184,8 +240,7 @@
                 </div>
                 <div class="modal-body py-4">
                     <label class="small fw-bold mb-2">เลือกประเภทเวร</label>
-                    <div id="modalShiftButtons" class="d-flex flex-wrap gap-2 mb-3">
-                        </div>
+                    <div id="modalShiftButtons" class="d-flex flex-wrap gap-2 mb-3"></div>
                     
                     <label class="small fw-bold mb-1">โน้ตเพิ่มเติม (ถ้ามี)</label>
                     <textarea id="modalNote" class="form-control mb-3" rows="2" placeholder="เช่น รพ. A, เปลี่ยนเวรกับ..."></textarea>

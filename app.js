@@ -2,12 +2,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 const firebaseConfig = {
-   apiKey: "AIzaSyC6mr7_SuaFlc9R_kv8y9lc6rfKkMVv4-U",
-   authDomain: "radiologyshift.firebaseapp.com",
-   projectId: "radiologyshift",
-   storageBucket: "radiologyshift.firebasestorage.app",
-   messagingSenderId: "1085770244333",
-   appId: "1:1085770244333:web:b7e635cb2f557bc26e6ce4"
+    apiKey: "AIzaSyC6mr7_SuaFlc9R_kv8y9lc6rfKkMVv4-U",
+    authDomain: "radiologyshift.firebaseapp.com",
+    projectId: "radiologyshift",
+    storageBucket: "radiologyshift.firebasestorage.app",
+    messagingSenderId: "1085770244333",
+    appId: "1:1085770244333:web:b7e635cb2f557bc26e6ce4"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -17,10 +17,59 @@ let calendar;
 let allHolidays = [];
 let currentSelectedDate = "";
 
+// ตัวแปรสำหรับระบบลงเวรด่วนและสรุปผล
+let isFastAddMode = false;
+let fastAddCurrentDate = null;
+let shiftTypesList = []; 
+
 document.addEventListener('DOMContentLoaded', function() {
     initSettingsView();
     initCalendarView();
 });
+
+// --- เพิ่มฟังก์ชันจัดการ Fast Add (ลงเวรด่วน) ---
+window.toggleFastAdd = (show) => {
+    isFastAddMode = show;
+    const bar = document.getElementById('fastAddBar');
+    if(show) {
+        bar.classList.remove('d-none');
+        // เริ่มต้นที่วันที่ปัจจุบัน
+        fastAddCurrentDate = new Date();
+        updateFastAddLabel();
+    } else {
+        bar.classList.add('d-none');
+    }
+};
+
+function updateFastAddLabel() {
+    const label = document.getElementById('fastAddDateLabel');
+    if(label) {
+        label.innerText = fastAddCurrentDate.toLocaleDateString('th-TH', { 
+            day: 'numeric', month: 'long', year: 'numeric' 
+        });
+    }
+}
+
+// ฟังก์ชันบันทึกเวรด่วนและเลื่อนวัน
+async function handleFastAdd(typeData) {
+    // ปรับ timezone ชดเชยเวลาเพื่อให้ได้วันที่ตรงตามปฏิทิน
+    const localDate = new Date(fastAddCurrentDate.getTime() - (fastAddCurrentDate.getTimezoneOffset() * 60000));
+    const dateStr = localDate.toISOString().split('T')[0];
+    
+    await addDoc(collection(db, "shifts"), {
+        date: dateStr,
+        name: typeData.name,
+        color: typeData.color,
+        time: typeData.hasTime ? `${typeData.start}-${typeData.end}` : "",
+        note: "" // ลงด่วนจะไม่มีโน้ต
+    });
+
+    // เลื่อนไปวันถัดไป
+    fastAddCurrentDate.setDate(fastAddCurrentDate.getDate() + 1);
+    updateFastAddLabel();
+    calendar.refetchEvents();
+}
+
 
 // --- ส่วนหน้าการจัดการประเภทเวร (Shift Settings) ---
 function initSettingsView() {
@@ -62,21 +111,28 @@ function initSettingsView() {
     onSnapshot(collection(db, "shiftTypes"), (snapshot) => {
         const list = document.getElementById('shiftTypeList');
         const modalSelect = document.getElementById('modalShiftSelect');
+        const fastAddButtons = document.getElementById('fastAddButtons'); // สำหรับปุ่มเวรด่วน
+        
         list.innerHTML = "";
         modalSelect.innerHTML = "<option value=''>-- เลือกเวร --</option>";
+        if(fastAddButtons) fastAddButtons.innerHTML = "";
+        shiftTypesList = []; // ล้างค่าเก่า
         
         snapshot.forEach(docSnap => {
             const t = docSnap.data();
             const id = docSnap.id;
             
-            // ใส่ในหน้าตั้งค่า
+            // เก็บรายการเวรไว้ใช้สำหรับสรุปผล
+            shiftTypesList.push({ id, ...t });
+            
+            // 1. ใส่ในหน้าตั้งค่า
             const item = document.createElement('div');
             item.className = "list-group-item d-flex justify-content-between align-items-center border-0 mb-2 shadow-sm rounded-3";
             item.innerHTML = `<div><span class="badge" style="background:${t.color}">&nbsp;</span> <b>${t.name}</b> ${t.hasTime ? `<small>(${t.start}-${t.end})</small>` : ""}</div>
                               <button class="btn btn-sm btn-outline-danger border-0" onclick="deleteType('${id}')">ลบ</button>`;
             list.appendChild(item);
 
-            // ใส่ใน Modal เลือกเวร
+            // 2. ใส่ใน Modal เลือกเวร
             const opt = document.createElement('option');
             opt.value = id;
             opt.dataset.name = t.name;
@@ -84,11 +140,21 @@ function initSettingsView() {
             opt.dataset.time = t.hasTime ? `${t.start}-${t.end}` : "";
             opt.innerText = t.name;
             modalSelect.appendChild(opt);
+
+            // 3. สร้างปุ่มสำหรับ Fast Add
+            if(fastAddButtons) {
+                const btn = document.createElement('button');
+                btn.className = "btn text-white fw-bold text-nowrap";
+                btn.style.backgroundColor = t.color;
+                btn.innerText = t.name;
+                btn.onclick = () => handleFastAdd(t);
+                fastAddButtons.appendChild(btn);
+            }
         });
     });
 }
 
-// ฟังก์ชันลบประเภทเวร (ประกาศให้เรียกจาก HTML ได้)
+// ฟังก์ชันลบประเภทเวร
 window.deleteType = async (id) => {
     if(confirm("ยืนยันการลบประเภทเวรนี้?")) await deleteDoc(doc(db, "shiftTypes", id));
 };
@@ -107,16 +173,19 @@ async function initCalendarView() {
         },
         datesSet: (info) => updateSidebarSummary(info.view.currentStart),
         events: async function(info, successCallback) {
-            // โหลดวันหยุด
+            // โหลดวันหยุด (เพิ่มการตรวจสอบข้อมูลว่างเพื่อป้องกัน Error)
             try {
                 const year = new Date().getFullYear();
                 const res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/TH`);
-                if(res.ok) {
-                    allHolidays = await res.json();
-                    const holEvents = allHolidays.map(h => ({ start: h.date, display: 'background', color: '#ffcccc' }));
-                    successCallback(holEvents);
+                if(res.ok && res.status !== 204) {
+                    const text = await res.text();
+                    if(text && text.trim().length > 0) {
+                        allHolidays = JSON.parse(text);
+                        const holEvents = allHolidays.map(h => ({ start: h.date, display: 'background', color: '#ffcccc' }));
+                        successCallback(holEvents);
+                    }
                 }
-            } catch(e) {}
+            } catch(e) { console.warn("ไม่สามารถโหลดวันหยุดได้", e); }
 
             // โหลดเวร
             const snap = await getDocs(collection(db, "shifts"));
@@ -125,13 +194,20 @@ async function initCalendarView() {
                 title: d.data().name,
                 start: d.data().date,
                 backgroundColor: d.data().color,
-                extendedProps: { shiftId: d.id }
+                extendedProps: { 
+                    shiftId: d.id,
+                    note: d.data().note || "" // ดึงโน้ตมาเก็บไว้
+                }
             }));
             successCallback(shifts);
         },
         eventClick: async function(info) {
             if(info.event.display === 'background') return;
-            if(confirm(`ลบเวร ${info.event.title} ออกจากปฏิทิน?`)) {
+            
+            // แสดงโน้ตให้เห็นตอนกดยืนยันการลบ
+            const noteText = info.event.extendedProps.note ? `\nโน้ต: ${info.event.extendedProps.note}` : "";
+            
+            if(confirm(`เวร: ${info.event.title}${noteText}\n\nต้องการลบเวรนี้ออกจากปฏิทินใช่หรือไม่?`)) {
                 await deleteDoc(doc(db, "shifts", info.event.extendedProps.shiftId));
                 calendar.refetchEvents();
             }
@@ -140,9 +216,11 @@ async function initCalendarView() {
     calendar.render();
 }
 
-// บันทึกเวรลงวันที่คลิก
+// บันทึกเวรลงวันที่คลิก (เพิ่มการบันทึกโน้ต)
 document.getElementById('modalSaveBtn').addEventListener('click', async () => {
     const select = document.getElementById('modalShiftSelect');
+    const noteInput = document.getElementById('modalNote'); // ช่องรับโน้ต
+    
     const opt = select.options[select.selectedIndex];
     if(!opt.value) return;
 
@@ -150,31 +228,50 @@ document.getElementById('modalSaveBtn').addEventListener('click', async () => {
         date: currentSelectedDate,
         name: opt.dataset.name,
         color: opt.dataset.color,
-        time: opt.dataset.time
+        time: opt.dataset.time || "",
+        note: noteInput ? noteInput.value : "" // บันทึกโน้ตลงฐานข้อมูล
     });
+    
+    // ล้างข้อมูลและปิด Modal
+    if(noteInput) noteInput.value = "";
+    select.value = "";
+    
     bootstrap.Modal.getInstance(document.getElementById('addEventModal')).hide();
     calendar.refetchEvents();
 });
 
-// สรุปข้อมูลข้างปฏิทิน
+// สรุปข้อมูลข้างปฏิทิน (อัปเดตให้อิงจากรายการเวรในตั้งค่า)
 async function updateSidebarSummary(startDate) {
     const m = startDate.getMonth();
     const y = startDate.getFullYear();
     const snap = await getDocs(collection(db, "shifts"));
+    
+    // กำหนดค่าเริ่มต้นเวรทุกประเภทให้เป็น 0 ก่อน
     const summary = {};
+    shiftTypesList.forEach(type => {
+        summary[type.name] = 0;
+    });
     
     snap.forEach(d => {
         const data = d.data();
         const dDate = new Date(data.date);
         if(dDate.getMonth() === m && dDate.getFullYear() === y) {
-            summary[data.name] = (summary[data.name] || 0) + 1;
+            if(summary.hasOwnProperty(data.name)) {
+                summary[data.name]++;
+            } else {
+                summary[data.name] = 1; // เผื่อเวรที่ถูกลบออกจากตั้งค่าไปแล้วแต่ยังอยู่ในปฏิทิน
+            }
         }
     });
 
     const sumBox = document.getElementById('summaryList');
     sumBox.innerHTML = "";
     Object.keys(summary).forEach(key => {
-        sumBox.innerHTML += `<div class="d-flex justify-content-between mb-2"><span>${key}</span> <b>${summary[key]} ครั้ง</b></div>`;
+        sumBox.innerHTML += `
+            <div class="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom border-light">
+                <span class="small">${key}</span> 
+                <span class="badge bg-light text-dark rounded-pill">${summary[key]} ครั้ง</span>
+            </div>`;
     });
 
     // อัปเดตวันหยุด

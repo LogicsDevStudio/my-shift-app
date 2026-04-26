@@ -26,8 +26,14 @@
         .day-btn { flex: 1; border-radius: 10px; font-weight: 500; transition: all 0.2s; }
         .day-btn.active { background-color: #0d6efd; color: white; border-color: #0d6efd; transform: scale(1.05); box-shadow: 0 4px 8px rgba(13,110,253,0.3); }
         
-        /* สไตล์ป้องกันการคลิกและตกแต่งวันหยุดในปฏิทิน */
         .holiday-event { pointer-events: none; opacity: 0.9; font-size: 0.8rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        
+        /* สไตล์สำหรับการซ่อนปุ่มเวลาพิมพ์ (PDF) */
+        @media print {
+            .navbar, .offcanvas, .btn, #fastAddBar, .summary-card { display: none !important; }
+            .calendar-card { box-shadow: none !important; padding: 0 !important; }
+            body { background: white; }
+        }
     </style>
 </head>
 <body>
@@ -112,7 +118,26 @@
     <div class="container mt-4 mb-5">
         
         <section id="view-calendar" class="view-section active">
-            <h4 class="fw-bold mb-3">ปฏิทินปฏิบัติงาน</h4>
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2">
+                <h4 class="fw-bold mb-0">ปฏิทินปฏิบัติงาน</h4>
+                
+                <div class="d-flex gap-2">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-primary fw-bold dropdown-toggle bg-white" type="button" data-bs-toggle="dropdown">
+                            <i class="fa-solid fa-file-export me-1"></i> ส่งออก
+                        </button>
+                        <ul class="dropdown-menu shadow-sm border-0 rounded-3">
+                            <li><a class="dropdown-item py-2" href="#" onclick="exportToImage()"><i class="fa-solid fa-image me-2 text-success"></i> บันทึกเป็นรูปภาพ (PNG)</a></li>
+                            <li><a class="dropdown-item py-2" href="#" onclick="window.print()"><i class="fa-solid fa-file-pdf me-2 text-danger"></i> บันทึกเป็น PDF / พิมพ์</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item py-2" href="#" onclick="exportToICal()"><i class="fa-solid fa-calendar-days me-2 text-primary"></i> ซิงก์แอปปฏิทิน (iCal)</a></li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-success fw-bold shadow-sm" onclick="openFastAddModal()">
+                        <i class="fa-solid fa-bolt me-1"></i> ระบุเวรด่วน
+                    </button>
+                </div>
+            </div>
             
             <div id="todayStatusHighlight" class="alert alert-secondary shadow-sm fw-bold mb-3 d-flex align-items-center">
                 <i class="fa-solid fa-spinner fa-spin me-2"></i> กำลังตรวจสอบข้อมูลวันนี้...
@@ -120,13 +145,13 @@
 
             <div class="row g-4">
                 <div class="col-lg-9">
-                    <div class="calendar-card">
+                    <div class="calendar-card" id="calendarCaptureArea">
                         <div id="calendar"></div>
                     </div>
                 </div>
                 <div class="col-lg-3">
                     <div class="card summary-card mb-3">
-                        <div class="card-header bg-white border-0 fw-bold pt-3">📊 สรุปเดือนนี้</div>
+                        <div class="card-header bg-white border-0 fw-bold pt-3 pb-0 fs-5">📊 สรุปเดือนนี้</div>
                         <div class="card-body" id="summaryList"></div>
                     </div>
                     <div class="card summary-card border-0">
@@ -260,6 +285,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script type="module" src="app.js"></script>
 
     <script>
@@ -267,7 +293,6 @@
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.getElementById('view-' + viewId).classList.add('active');
             
-            // แจ้งให้ Calendar อัปเดตขนาดเมื่อแสดงผล
             if (viewId === 'calendar' && window.calendarInstance) {
                 setTimeout(() => {
                     window.calendarInstance.updateSize();

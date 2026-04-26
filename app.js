@@ -43,6 +43,7 @@ async function loadHolidays() {
             const text = await res.text();
             if(text && text.trim().length > 0) {
                 allHolidays = JSON.parse(text);
+                updateTodayStatus(); // อัปเดตสถานะวันนี้หลังจากโหลดเสร็จ
             }
         }
     } catch(e) { console.warn("ไม่สามารถโหลดวันหยุดได้", e); }
@@ -55,6 +56,7 @@ function listenToDatabase() {
             calendar.refetchEvents();
             updateSidebarSummary(calendar.view.currentStart);
         }
+        updateTodayStatus(); 
     });
 
     onSnapshot(collection(db, "customHolidays"), (snapshot) => {
@@ -64,7 +66,53 @@ function listenToDatabase() {
             calendar.refetchEvents();
             updateSidebarSummary(calendar.view.currentStart);
         }
+        updateTodayStatus();
     });
+}
+
+// --- ฟังก์ชันอัปเดตสถานะของวันนี้ (Today's Status) ---
+function updateTodayStatus() {
+    const statusBox = document.getElementById('todayStatusHighlight');
+    if (!statusBox) return;
+
+    // หาค่าวันที่ปัจจุบันใน Timezone ท้องถิ่น (YYYY-MM-DD)
+    const today = new Date();
+    const localDate = new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+
+    let statusMessages = [];
+    let isHoliday = false;
+
+    // เช็ควันหยุดราชการ
+    const apiHoliday = allHolidays.find(h => h.date === localDate);
+    if (apiHoliday) {
+        statusMessages.push(`🇹🇭 ${apiHoliday.localName}`);
+        isHoliday = true;
+    }
+
+    // เช็ควันหยุดกำหนดเอง
+    const customHoliday = customHolidaysData.find(h => h.date === localDate);
+    if (customHoliday) {
+        statusMessages.push(`🌴 ${customHoliday.name}`);
+        isHoliday = true;
+    }
+
+    // เช็คเวร
+    const todayShifts = allShiftsData.filter(s => s.date === localDate);
+    
+    if (todayShifts.length > 0) {
+        let shiftBadges = todayShifts.map(s => `<span class="badge ms-1" style="background-color: ${s.color}">${s.name}</span>`).join('');
+        
+        statusBox.className = "alert alert-warning shadow-sm fw-bold mb-3 d-flex align-items-center";
+        let prefix = isHoliday ? `${statusMessages.join(' | ')} และมีเวร ` : `วันนี้คุณมีเวร `;
+        statusBox.innerHTML = `<div><i class="fa-solid fa-user-doctor me-2 fs-5"></i> ${prefix} ${shiftBadges}</div>`;
+        
+    } else if (isHoliday) {
+        statusBox.className = "alert alert-success shadow-sm fw-bold mb-3 d-flex align-items-center";
+        statusBox.innerHTML = `<div><i class="fa-solid fa-umbrella-beach me-2 fs-5"></i> วันนี้เป็นวันหยุด: ${statusMessages.join(' | ')} (พักผ่อนได้เลย)</div>`;
+    } else {
+        statusBox.className = "alert alert-secondary shadow-sm fw-bold mb-3 d-flex align-items-center";
+        statusBox.innerHTML = `<div><i class="fa-solid fa-mug-hot me-2 fs-5"></i> วันนี้ไม่มีเวร (พักผ่อนได้เต็มที่)</div>`;
+    }
 }
 
 function initSystemSettings() {
@@ -180,6 +228,9 @@ window.startFastAdd = () => {
     isFastAddMode = true;
     document.getElementById('fastAddBar').classList.remove('d-none');
     updateFastAddLabel();
+    
+    // เปลี่ยนหน้าไปที่หน้าปฏิทินแบบอัตโนมัติเพื่อให้พร้อมระบุเวร
+    switchView('calendar');
 };
 
 window.toggleFastAdd = (show) => {
@@ -300,7 +351,6 @@ function initCalendarView() {
         },
         datesSet: (info) => updateSidebarSummary(info.view.currentStart),
         events: function(info, successCallback) {
-            // ปรับวันหยุดให้แสดงเป็นแถบข้อความ (Block Event)
             const apiEvents = allHolidays.map(h => ({ 
                 start: h.date, title: `🇹🇭 ${h.localName}`, allDay: true, 
                 display: 'block', backgroundColor: '#ffe6e6', borderColor: '#ffcccc', textColor: '#cc0000',
@@ -321,7 +371,7 @@ function initCalendarView() {
             successCallback([...apiEvents, ...customEvents, ...shiftEvents]);
         },
         eventClick: async function(info) {
-            if(info.event.extendedProps.isHoliday) return; // ป้องกันการคลิกวันหยุด
+            if(info.event.extendedProps.isHoliday) return; 
             
             const noteText = info.event.extendedProps.note ? `\nโน้ต: ${info.event.extendedProps.note}` : "";
             if(confirm(`เวร: ${info.event.title}${noteText}\n\nต้องการลบเวรนี้ออกจากปฏิทินใช่หรือไม่?`)) {
@@ -331,7 +381,6 @@ function initCalendarView() {
     });
     calendar.render();
     
-    // บันทึกตัวแปร calendar ลงใน Window เพื่อให้หน้า HTML สั่ง Update ขนาดได้
     window.calendarInstance = calendar;
 }
 

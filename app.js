@@ -203,12 +203,11 @@ function renderCustomHolidaysAdmin() {
         const month = hDate.toLocaleDateString('th-TH', { month:'short' });
         
         const item = document.createElement('div');
-        // [UI อัปเกรด] ปรับการ์ดรายการวันหยุดให้ดูพรีเมียมขึ้น เพิ่มเอฟเฟกต์เบาๆ
-        item.className = "list-group-item d-flex justify-content-between align-items-center mb-3 shadow-sm rounded-4 bg-white border border-light p-3 hover-effect";
+        // [UI อัปเกรด] เปลี่ยนจาก p-3 เป็น p-4 เพื่อเพิ่มระยะห่างจากขอบ (Padding) ให้ดูโปร่งขึ้น
+        item.className = "list-group-item d-flex justify-content-between align-items-center mb-3 shadow-sm rounded-4 bg-white border border-light p-4 hover-effect";
         item.style.transition = "all 0.2s ease-in-out";
         item.innerHTML = `
-            <div class="d-flex align-items-center gap-3">
-                <div class="bg-danger bg-opacity-10 text-danger rounded-4 p-2 text-center d-flex flex-column justify-content-center border border-danger border-opacity-25" style="min-width: 60px; height: 60px;">
+            <div class="d-flex align-items-center gap-4"> <div class="bg-danger bg-opacity-10 text-danger rounded-4 p-2 text-center d-flex flex-column justify-content-center border border-danger border-opacity-25" style="min-width: 60px; height: 60px;">
                     <div class="fw-bold fs-4 lh-1">${day}</div>
                     <div class="small fw-semibold mt-1" style="font-size: 0.75rem;">${month}</div>
                 </div>
@@ -218,8 +217,8 @@ function renderCustomHolidaysAdmin() {
                 </div>
             </div>
             <div class="d-flex gap-2">
-                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-sm" onclick="editCustomHoliday('${h.id}', '${h.date}', '${h.name}')" title="แก้ไข"><i class="fa-solid fa-pen"></i></button>
-                <button class="btn btn-sm btn-outline-danger rounded-pill px-3 shadow-sm" onclick="deleteCustomHoliday('${h.id}')" title="ลบ"><i class="fa-solid fa-trash-can"></i></button>
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-2 shadow-sm" onclick="editCustomHoliday('${h.id}', '${h.date}', '${h.name}')" title="แก้ไข"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn btn-sm btn-outline-danger rounded-pill px-3 py-2 shadow-sm" onclick="deleteCustomHoliday('${h.id}')" title="ลบ"><i class="fa-solid fa-trash-can"></i></button>
             </div>
         `;
         list.appendChild(item);

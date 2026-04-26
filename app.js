@@ -43,7 +43,7 @@ async function loadHolidays() {
             const text = await res.text();
             if(text && text.trim().length > 0) {
                 allHolidays = JSON.parse(text);
-                updateTodayStatus(); // อัปเดตสถานะวันนี้หลังจากโหลดเสร็จ
+                updateTodayStatus(); 
             }
         }
     } catch(e) { console.warn("ไม่สามารถโหลดวันหยุดได้", e); }
@@ -70,33 +70,28 @@ function listenToDatabase() {
     });
 }
 
-// --- ฟังก์ชันอัปเดตสถานะของวันนี้ (Today's Status) ---
 function updateTodayStatus() {
     const statusBox = document.getElementById('todayStatusHighlight');
     if (!statusBox) return;
 
-    // หาค่าวันที่ปัจจุบันใน Timezone ท้องถิ่น (YYYY-MM-DD)
     const today = new Date();
     const localDate = new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
 
     let statusMessages = [];
     let isHoliday = false;
 
-    // เช็ควันหยุดราชการ
     const apiHoliday = allHolidays.find(h => h.date === localDate);
     if (apiHoliday) {
         statusMessages.push(`🇹🇭 ${apiHoliday.localName}`);
         isHoliday = true;
     }
 
-    // เช็ควันหยุดกำหนดเอง
     const customHoliday = customHolidaysData.find(h => h.date === localDate);
     if (customHoliday) {
         statusMessages.push(`🌴 ${customHoliday.name}`);
         isHoliday = true;
     }
 
-    // เช็คเวร
     const todayShifts = allShiftsData.filter(s => s.date === localDate);
     
     if (todayShifts.length > 0) {
@@ -228,8 +223,6 @@ window.startFastAdd = () => {
     isFastAddMode = true;
     document.getElementById('fastAddBar').classList.remove('d-none');
     updateFastAddLabel();
-    
-    // เปลี่ยนหน้าไปที่หน้าปฏิทินแบบอัตโนมัติเพื่อให้พร้อมระบุเวร
     switchView('calendar');
 };
 
@@ -397,18 +390,26 @@ document.getElementById('modalSaveBtn').addEventListener('click', async () => {
     bootstrap.Modal.getInstance(document.getElementById('addEventModal')).hide();
 });
 
+// ฟังก์ชันตกแต่งสีสันสรุปยอดเวร
 function updateSidebarSummary(startDate) {
     if(!startDate) return;
     const m = startDate.getMonth();
     const y = startDate.getFullYear();
     const summary = {};
-    shiftTypesList.forEach(type => { summary[type.name] = 0; });
+    
+    // ตั้งค่าตัวแปรเพื่อเก็บสี
+    shiftTypesList.forEach(type => { 
+        summary[type.name] = { count: 0, color: type.color }; 
+    });
     
     allShiftsData.forEach(data => {
         const dDate = new Date(data.date);
         if(dDate.getMonth() === m && dDate.getFullYear() === y) {
-            if(summary.hasOwnProperty(data.name)) summary[data.name]++;
-            else summary[data.name] = 1;
+            if(summary[data.name]) {
+                summary[data.name].count++;
+            } else {
+                summary[data.name] = { count: 1, color: data.color || '#6c757d' };
+            }
         }
     });
 
@@ -416,30 +417,100 @@ function updateSidebarSummary(startDate) {
     if(sumBox) {
         sumBox.innerHTML = "";
         Object.keys(summary).forEach(key => {
-            sumBox.innerHTML += `
-                <div class="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom border-light">
-                    <span class="small fw-bold">${key}</span> 
-                    <span class="badge text-white rounded-pill" style="background:#555;">${summary[key]}</span>
-                </div>`;
+            const s = summary[key];
+            if (s.count > 0) { // แสดงเฉพาะเวรที่ถูกใช้งานในเดือนนั้น
+                // สร้างกล่องสีพื้นหลังอ่อนๆ และตัวอักษรสีเข้มตามสีเวร
+                sumBox.innerHTML += `
+                    <div class="d-flex justify-content-between align-items-center mb-3 p-2 rounded-3 shadow-sm" style="background-color: ${s.color}1A; border-left: 5px solid ${s.color};">
+                        <span class="fw-bold" style="color: ${s.color};">${key}</span> 
+                        <span class="badge rounded-pill shadow-sm" style="background-color: ${s.color}; font-size: 0.9rem;">${s.count} เวร</span>
+                    </div>`;
+            }
         });
+        if (sumBox.innerHTML === "") {
+            sumBox.innerHTML = `<div class="text-muted text-center small my-3">ไม่มีเวรในเดือนนี้</div>`;
+        }
     }
 
     const holBox = document.getElementById('holidayList');
     if(holBox) {
         holBox.innerHTML = "";
-        
         allHolidays.forEach(h => {
             const hDate = new Date(h.date);
             if(hDate.getMonth() === m && hDate.getFullYear() === y) {
-                holBox.innerHTML += `<li class="list-group-item small d-flex justify-content-between text-muted"><span>🇹🇭 ${hDate.getDate()} - ${h.localName}</span></li>`;
+                holBox.innerHTML += `<li class="list-group-item small d-flex justify-content-between text-muted border-light"><span>🇹🇭 ${hDate.getDate()} - ${h.localName}</span></li>`;
             }
         });
-        
         customHolidaysData.forEach(h => {
             const hDate = new Date(h.date);
             if(hDate.getMonth() === m && hDate.getFullYear() === y) {
-                holBox.innerHTML += `<li class="list-group-item small d-flex justify-content-between text-primary fw-bold"><span>🌴 ${hDate.getDate()} - ${h.name}</span></li>`;
+                holBox.innerHTML += `<li class="list-group-item small d-flex justify-content-between text-primary fw-bold border-light"><span>🌴 ${hDate.getDate()} - ${h.name}</span></li>`;
             }
         });
+        if (holBox.innerHTML === "") {
+            holBox.innerHTML = `<li class="list-group-item text-muted text-center small my-2 border-0">ไม่มีวันหยุดในเดือนนี้</li>`;
+        }
     }
 }
+
+// ==========================================
+// ส่วนของการส่งออก (Export Features)
+// ==========================================
+
+// ส่งออกเป็นรูปภาพ (ใช้ html2canvas)
+window.exportToImage = async () => {
+    const targetElement = document.getElementById('calendarCaptureArea');
+    const originalShadow = targetElement.style.boxShadow;
+    
+    // เอาเงาออกชั่วคราวเพื่อให้ภาพขอบชัด
+    targetElement.style.boxShadow = 'none';
+    
+    try {
+        const canvas = await html2canvas(targetElement, { scale: 2 });
+        const link = document.createElement('a');
+        link.download = `ตารางเวรรังสี_${new Date().toLocaleDateString('th-TH').replace(/\//g, '-')}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    } catch (err) {
+        alert("เกิดข้อผิดพลาดในการบันทึกรูปภาพ: " + err);
+    }
+    
+    // คืนค่าเงากลับมา
+    targetElement.style.boxShadow = originalShadow;
+};
+
+// ส่งออกเป็นไฟล์ iCal (.ics) เพื่อซิงก์แอปปฏิทินอื่น
+window.exportToICal = () => {
+    let icsContent = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Radiology Shift Pro//TH\n";
+    
+    allShiftsData.forEach(shift => {
+        const dateObj = new Date(shift.date);
+        const dtStart = dateObj.toISOString().split('T')[0].replace(/-/g, '');
+        
+        // สำหรับเวรทั้งวัน (All day event) วันที่สิ้นสุดจะเป็นวันถัดไป
+        dateObj.setDate(dateObj.getDate() + 1);
+        const dtEnd = dateObj.toISOString().split('T')[0].replace(/-/g, '');
+        
+        icsContent += "BEGIN:VEVENT\n";
+        icsContent += `DTSTART;VALUE=DATE:${dtStart}\n`;
+        icsContent += `DTEND;VALUE=DATE:${dtEnd}\n`;
+        icsContent += `SUMMARY:เวร ${shift.name}\n`;
+        if(shift.time || shift.note) {
+            let desc = "";
+            if(shift.time) desc += `เวลา: ${shift.time} `;
+            if(shift.note) desc += `(โน้ต: ${shift.note})`;
+            icsContent += `DESCRIPTION:${desc.trim()}\n`;
+        }
+        icsContent += "END:VEVENT\n";
+    });
+    
+    icsContent += "END:VCALENDAR";
+    
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'radiology_shifts.ics';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};

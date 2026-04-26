@@ -2,8 +2,8 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Radiology Shift Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radiology Shift Pro ☢️</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
@@ -11,179 +11,62 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
-        /* Minimalist Global Styles */
-        body { 
-            font-family: 'Prompt', sans-serif; 
-            background-color: #fafafa; 
-            color: #222; 
-            letter-spacing: 0.2px;
-            -webkit-font-smoothing: antialiased;
-        }
-        
-        /* Navbar */
-        .navbar { 
-            background-color: #fff; 
-            border-bottom: 1px solid #eaeaea; 
-        }
-        .navbar-brand {
-            color: #111 !important;
-            letter-spacing: 0.5px;
-        }
-
-        /* Typography & Forms - Optimized for touch */
-        h4, h5, h6 { font-weight: 600; color: #111; }
-        .form-control {
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-            box-shadow: none !important;
-            transition: all 0.2s;
-            padding: 0.6rem 0.75rem; /* Touch friendly */
-        }
-        .form-control:focus { border-color: #999; }
-        
-        /* Minimal Buttons */
-        .btn {
-            border-radius: 8px;
-            box-shadow: none !important;
-            font-weight: 500;
-            letter-spacing: 0.3px;
-            padding: 0.6rem 1rem; /* Touch friendly */
-        }
-        .btn-sm { padding: 0.3rem 0.6rem; }
-        .btn-primary { background-color: #222; border-color: #222; color: #fff; }
-        .btn-primary:hover { background-color: #000; border-color: #000; }
-        .btn-outline-primary { border-color: #ddd; color: #222; }
-        .btn-outline-primary:hover { background-color: #f5f5f5; border-color: #ccc; color: #000; }
-
-        /* Cards & Layout */
-        .minimal-card { 
-            background: #fff; 
-            padding: 24px; 
-            border-radius: 16px; 
-            border: 1px solid #eaeaea;
-        }
-        .summary-card { 
-            border-radius: 16px; 
-            border: 1px solid #eaeaea; 
-            background: #fff; 
-        }
-        .summary-card .card-header { background: transparent; border-bottom: 1px solid #f0f0f0; }
-
-        /* Offcanvas Menu */
-        .offcanvas { background-color: #fff; border-bottom: 1px solid #eaeaea; }
-        .menu-card { 
-            transition: all 0.2s ease; 
-            border-radius: 12px; 
-            border: 1px solid transparent; 
-            cursor: pointer; 
-            background: #fafafa;
-        }
-        .menu-card:hover { background: #fff; border-color: #ddd; transform: translateY(-3px); }
-        .menu-card:active { transform: scale(0.98); }
-        .menu-icon { font-size: 1.8rem; color: #333; margin-bottom: 12px; }
-
-        /* Calendar Customizations (Minimalist) */
-        .fc-theme-standard td, .fc-theme-standard th { border-color: #f0f0f0; }
-        .fc .fc-toolbar-title { font-size: 1.25em; font-weight: 600; color: #111; }
-        .fc .fc-button-primary { 
-            background-color: #fff; 
-            color: #333; 
-            border: 1px solid #ddd; 
-            text-transform: capitalize;
-            box-shadow: none !important; 
-            padding: 0.4rem 0.8rem;
-        }
-        .fc .fc-button-primary:hover, .fc .fc-button-primary:not(:disabled):active { 
-            background-color: #f4f4f4; 
-            color: #000; 
-            border-color: #ccc; 
-        }
-        .fc-event { 
-            cursor: pointer; 
-            border: none !important; 
-            padding: 4px 6px; 
-            font-weight: 500; 
-            border-radius: 4px; 
-            font-size: 0.8rem; 
-        }
-        
+        body { font-family: 'Prompt', sans-serif; background-color: #f0f2f5; color: #1c1e21; }
+        .navbar { background-color: #ffffff; border-bottom: 1px solid #e5e5e5; }
+        .calendar-card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        .fc-event { cursor: pointer; border: none !important; padding: 3px 6px; font-weight: 500; border-radius: 6px; font-size: 0.85rem; }
+        .menu-card { transition: transform 0.2s; border-radius: 20px; border: none; cursor: pointer; }
+        .menu-card:active { transform: scale(0.95); }
         .preview-event { padding: 8px 15px; border-radius: 8px; display: inline-block; font-weight: 500; margin-top: 10px; }
-        .view-section { display: none; animation: fadeIn 0.3s ease; }
+        .summary-card { border-radius: 12px; border: none; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .view-section { display: none; }
         .view-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .day-btn { flex: 1; min-width: 60px; border-radius: 8px; font-weight: 500; border: 1px solid #ddd; color: #555; background: #fff; }
-        .day-btn.active { background-color: #222; color: white; border-color: #222; }
-        .holiday-event { pointer-events: none; opacity: 0.8; font-size: 0.75rem; background: transparent !important; color: #888 !important; }
+        .shift-btn { transition: opacity 0.2s; }
         
-        .list-group-item { border-color: #f0f0f0; padding: 12px 16px; }
-
-        /* Horizontal Scroll without Scrollbar for Fast Add */
-        .overflow-auto::-webkit-scrollbar { display: none; }
-        .overflow-auto { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* 📱 Mobile Responsiveness Adjustments */
-        @media (max-width: 768px) {
-            body { font-size: 0.95rem; }
-            .container { padding-left: 12px; padding-right: 12px; }
-            .minimal-card { padding: 16px; border-radius: 12px; }
-            
-            /* Calendar Mobile Adjustments */
-            .fc .fc-toolbar-title { font-size: 1.1rem !important; text-align: center; }
-            .fc .fc-button { padding: 0.3rem 0.5rem !important; font-size: 0.85rem !important; }
-            .fc-header-toolbar { flex-direction: column; gap: 12px; margin-bottom: 1rem !important; }
-            .fc-toolbar-chunk { display: flex; justify-content: center; width: 100%; gap: 5px; }
-            .fc-event { font-size: 0.75rem; padding: 2px 4px; }
-            
-            /* Menu Mobile Adjustments */
-            .menu-card { padding: 12px 8px; }
-            .menu-icon { font-size: 1.4rem; margin-bottom: 8px; }
-            .offcanvas-body .row { gap: 10px 0; }
-            
-            /* General Space Savers */
-            h4 { font-size: 1.25rem; }
-            h5 { font-size: 1.1rem; }
-            .mb-5 { margin-bottom: 5rem !important; /* Space for fast add bar */ }
-        }
-
+        .day-btn { flex: 1; border-radius: 10px; font-weight: 500; transition: all 0.2s; }
+        .day-btn.active { background-color: #0d6efd; color: white; border-color: #0d6efd; transform: scale(1.05); box-shadow: 0 4px 8px rgba(13,110,253,0.3); }
+        
+        .holiday-event { pointer-events: none; opacity: 0.9; font-size: 0.8rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        
+        /* สไตล์สำหรับการซ่อนปุ่มเวลาพิมพ์ (PDF) */
         @media print {
             .navbar, .offcanvas, .btn, #fastAddBar, .summary-card { display: none !important; }
-            .minimal-card { border: none !important; padding: 0 !important; }
+            .calendar-card { box-shadow: none !important; padding: 0 !important; }
             body { background: white; }
         }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-light sticky-top">
-        <div class="container d-flex justify-content-between align-items-center py-1">
-            <button class="btn btn-light px-3 border-0 bg-transparent text-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#fullScreenMenu">
-                <i class="fa-solid fa-bars fs-5"></i>
+    <nav class="navbar navbar-light sticky-top shadow-sm">
+        <div class="container">
+            <button class="btn btn-light rounded-pill px-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#fullScreenMenu">
+                <i class="fa-solid fa-bars me-2"></i> เมนู
             </button>
-            <span class="navbar-brand fw-bold mx-auto text-truncate" style="max-width: 200px;">Radiology Shift Pro</span>
-            <div style="width: 42px;"></div> </div>
+            <span class="navbar-brand fw-bold text-primary mx-auto">Radiology Shift Pro</span>
+        </div>
     </nav>
 
-    <div id="fastAddBar" class="fixed-bottom bg-white border-top p-3 d-none" style="z-index: 1050; box-shadow: 0 -4px 15px rgba(0,0,0,0.05);">
-        <div class="container px-0">
-            <div class="d-flex align-items-center justify-content-between mb-2 px-2">
-                <h6 class="mb-0 fw-bold fs-6"><i class="fa-solid fa-bolt me-2 text-warning"></i>ลงเวร: <span id="fastAddDateLabel" class="text-dark fw-normal"></span></h6>
-                <button class="btn btn-sm btn-outline-secondary border-0" onclick="toggleFastAdd(false)"><i class="fa-solid fa-xmark"></i> ปิด</button>
+    <div id="fastAddBar" class="fixed-bottom bg-white shadow-lg border-top p-3 d-none" style="z-index: 1050;">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <h6 class="mb-0 fw-bold">🚀 โหมดลงเวรด่วน: <span id="fastAddDateLabel" class="text-primary"></span></h6>
+                <button class="btn btn-sm btn-outline-secondary" onclick="toggleFastAdd(false)">ปิดโหมดนี้</button>
             </div>
-            <div id="fastAddButtons" class="d-flex gap-2 overflow-auto pb-1 px-2 w-100"></div>
+            <div id="fastAddButtons" class="d-flex gap-2 overflow-auto pb-2"></div>
         </div>
     </div>
 
     <div class="modal fade" id="fastAddDateModal" tabindex="-1">
-        <div class="modal-dialog modal-sm modal-dialog-centered px-3">
-            <div class="modal-content border-0 rounded-4" style="box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
                 <div class="modal-header border-0 pb-0">
                     <h6 class="fw-bold mb-0">เลือกวันเริ่มต้นลงเวร</h6>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body py-4 text-center">
-                    <input type="date" id="fastAddStartDate" class="form-control mb-3 text-center fs-5">
-                    <button class="btn btn-primary w-100 py-2 fw-bold" onclick="startFastAdd()">เริ่มระบุเวร</button>
+                    <input type="date" id="fastAddStartDate" class="form-control mb-3 text-center">
+                    <button class="btn btn-success w-100 py-2 fw-bold" onclick="startFastAdd()">เริ่มระบุเวรด่วน</button>
                 </div>
             </div>
         </div>
@@ -194,55 +77,55 @@
             <h5 class="offcanvas-title fw-bold">เมนูหลัก</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
-        <div class="offcanvas-body">
-            <div class="container">
-                <div class="row g-2 text-center justify-content-center">
-                    <div class="col-4 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100 d-flex justify-content-center align-items-center" onclick="switchView('calendar')" data-bs-dismiss="offcanvas">
-                            <i class="fa-regular fa-calendar menu-icon"></i>
-                            <h6 class="fw-bold mb-0" style="font-size: 0.8rem;">ปฏิทินเวร</h6>
+        <div class="offcanvas-body bg-light">
+            <div class="container mt-4">
+                <div class="row g-4 text-center justify-content-center">
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card shadow-sm py-4" onclick="switchView('calendar')" data-bs-dismiss="offcanvas">
+                            <div class="display-5 mb-2">📅</div>
+                            <h6 class="fw-bold">ปฏิทินเวร</h6>
                         </div>
                     </div>
-                    <div class="col-4 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100 d-flex justify-content-center align-items-center" onclick="openFastAddModal()" data-bs-dismiss="offcanvas">
-                            <i class="fa-solid fa-bolt menu-icon"></i>
-                            <h6 class="fw-bold mb-0" style="font-size: 0.8rem;">ระบุด่วน</h6>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card shadow-sm py-4" onclick="openFastAddModal()" data-bs-dismiss="offcanvas">
+                            <div class="display-5 mb-2">⚡</div>
+                            <h6 class="fw-bold">ระบุเวรด่วน</h6>
                         </div>
                     </div>
-                    <div class="col-4 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100 d-flex justify-content-center align-items-center" onclick="switchView('settings')" data-bs-dismiss="offcanvas">
-                            <i class="fa-solid fa-sliders menu-icon"></i>
-                            <h6 class="fw-bold mb-0" style="font-size: 0.8rem;">ตั้งค่าเวร</h6>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card shadow-sm py-4" onclick="switchView('settings')" data-bs-dismiss="offcanvas">
+                            <div class="display-5 mb-2">⚙️</div>
+                            <h6 class="fw-bold">ตั้งค่าเวร</h6>
                         </div>
                     </div>
-                    <div class="col-4 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100 d-flex justify-content-center align-items-center" onclick="switchView('holidays')" data-bs-dismiss="offcanvas">
-                            <i class="fa-solid fa-umbrella-beach menu-icon"></i>
-                            <h6 class="fw-bold mb-0" style="font-size: 0.8rem;">วันหยุด</h6>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card shadow-sm py-4" onclick="switchView('holidays')" data-bs-dismiss="offcanvas">
+                            <div class="display-5 mb-2">🌴</div>
+                            <h6 class="fw-bold">จัดการวันหยุด</h6>
                         </div>
                     </div>
-                    <div class="col-4 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100 d-flex justify-content-center align-items-center" onclick="switchView('system')" data-bs-dismiss="offcanvas">
-                            <i class="fa-solid fa-gear menu-icon"></i>
-                            <h6 class="fw-bold mb-0" style="font-size: 0.8rem;">ระบบ</h6>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card shadow-sm py-4" onclick="switchView('system')" data-bs-dismiss="offcanvas">
+                            <div class="display-5 mb-2">🛠️</div>
+                            <h6 class="fw-bold">ตั้งค่าระบบ</h6>
                         </div>
                     </div>
-                    <div class="col-4 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100 d-flex justify-content-center align-items-center" onclick="exportToImage()" data-bs-dismiss="offcanvas">
-                            <i class="fa-regular fa-image menu-icon"></i>
-                            <h6 class="fw-bold mb-0" style="font-size: 0.8rem;">เซฟรูป</h6>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card shadow-sm py-4" onclick="exportToImage()" data-bs-dismiss="offcanvas">
+                            <div class="display-5 mb-2">🖼️</div>
+                            <h6 class="fw-bold">บันทึกรูปภาพ</h6>
                         </div>
                     </div>
-                    <div class="col-4 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100 d-flex justify-content-center align-items-center" onclick="window.print()" data-bs-dismiss="offcanvas">
-                            <i class="fa-solid fa-print menu-icon"></i>
-                            <h6 class="fw-bold mb-0" style="font-size: 0.8rem;">PDF</h6>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card shadow-sm py-4" onclick="window.print()" data-bs-dismiss="offcanvas">
+                            <div class="display-5 mb-2">🖨️</div>
+                            <h6 class="fw-bold">พิมพ์ / PDF</h6>
                         </div>
                     </div>
-                    <div class="col-4 col-md-4 col-lg-2">
-                        <div class="card menu-card h-100 d-flex justify-content-center align-items-center" onclick="exportToICal()" data-bs-dismiss="offcanvas">
-                            <i class="fa-solid fa-mobile-screen menu-icon"></i>
-                            <h6 class="fw-bold mb-0" style="font-size: 0.8rem;">ซิงก์ iCal</h6>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="card menu-card shadow-sm py-4" onclick="exportToICal()" data-bs-dismiss="offcanvas">
+                            <div class="display-5 mb-2">📲</div>
+                            <h6 class="fw-bold">ซิงก์ iCal</h6>
                         </div>
                     </div>
                 </div>
@@ -250,107 +133,107 @@
         </div>
     </div>
 
-    <div class="container mt-4 mb-5 pb-5">
+    <div class="container mt-4 mb-5">
         
         <section id="view-calendar" class="view-section active">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2">
-                <h4 class="fw-bold mb-0">ตารางปฏิบัติงาน</h4>
+                <h4 class="fw-bold mb-0">ปฏิทินปฏิบัติงาน</h4>
             </div>
             
-            <div id="todayStatusHighlight" class="alert bg-white border small mb-3 d-flex align-items-center" style="border-radius: 8px;">
-                <i class="fa-solid fa-spinner fa-spin me-2 text-muted"></i> กำลังตรวจสอบข้อมูล...
+            <div id="todayStatusHighlight" class="alert alert-secondary shadow-sm fw-bold mb-3 d-flex align-items-center">
+                <i class="fa-solid fa-spinner fa-spin me-2"></i> กำลังตรวจสอบข้อมูลวันนี้...
             </div>
 
             <div class="row g-4">
                 <div class="col-lg-9">
-                    <div class="minimal-card" id="calendarCaptureArea">
+                    <div class="calendar-card" id="calendarCaptureArea">
                         <div id="calendar"></div>
                     </div>
                 </div>
                 <div class="col-lg-3">
-                    <div class="card summary-card mb-3 border-0 shadow-none" style="background: transparent;">
-                        <div class="card-header px-0 fw-bold pt-1 pb-2 fs-6 border-bottom">สรุปข้อมูลเดือนนี้</div>
-                        <div class="card-body px-0 pt-3 pb-0" id="summaryList"></div>
+                    <div class="card summary-card mb-3">
+                        <div class="card-header bg-white border-0 fw-bold pt-3 pb-0 fs-5">📊 สรุปเดือนนี้</div>
+                        <div class="card-body" id="summaryList"></div>
                     </div>
-                    <div class="card summary-card border-0 shadow-none" style="background: transparent;">
-                        <div class="card-header px-0 fw-bold pt-3 pb-2 fs-6 border-bottom">วันหยุดประจำเดือน</div>
-                        <ul class="list-group list-group-flush bg-transparent" id="holidayList"></ul>
+                    <div class="card summary-card border-0">
+                        <div class="card-header bg-white border-0 fw-bold text-danger pt-3">🗓️ วันหยุดประจำเดือน</div>
+                        <ul class="list-group list-group-flush" id="holidayList"></ul>
                     </div>
                 </div>
             </div>
         </section>
 
         <section id="view-settings" class="view-section">
-            <div class="row justify-content-center g-4">
-                <div class="col-md-5">
-                    <div class="minimal-card">
-                        <h5 class="fw-bold mb-4">จัดการประเภทเวร</h5>
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0 mb-4 p-4 rounded-4">
+                        <h4 class="fw-bold mb-4">จัดการประเภทเวร</h4>
                         <div class="mb-3">
-                            <label class="form-label small text-muted">ชื่อเวร (เช่น เช้า, บ่าย, ดึก)</label>
-                            <input type="text" id="typeName" class="form-control" placeholder="ระบุชื่อเวร">
+                            <label class="form-label small fw-bold">ชื่อเวร (เช่น เช้า, บ่าย, ดึก)</label>
+                            <input type="text" id="typeName" class="form-control rounded-3" placeholder="ระบุชื่อเวร">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label small text-muted">กำหนดสี</label>
-                            <input type="color" id="typeColor" class="form-control form-control-color w-100 border-0 p-0" value="#222222" style="height: 44px; border-radius: 8px; overflow: hidden;">
+                            <label class="form-label small fw-bold">กำหนดสี</label>
+                            <input type="color" id="typeColor" class="form-control form-control-color w-100 border-0 p-1" value="#007AFF">
                         </div>
                         <div class="mb-3">
-                            <div class="form-check form-switch fs-6">
-                                <input class="form-check-input mt-1" type="checkbox" id="toggleTime">
-                                <label class="form-check-label small text-muted ms-1" for="toggleTime">ระบุช่วงเวลา</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="toggleTime">
+                                <label class="form-check-label small fw-bold" for="toggleTime">ระบุช่วงเวลา</label>
                             </div>
                         </div>
                         <div id="timeInputSection" style="display: none;">
                             <div class="row g-2">
                                 <div class="col-6">
-                                    <label class="small text-muted">เริ่มต้น</label>
+                                    <label class="small">เริ่มต้น</label>
                                     <input type="time" id="startTime" class="form-control">
                                 </div>
                                 <div class="col-6">
-                                    <label class="small text-muted">สิ้นสุด</label>
+                                    <label class="small">สิ้นสุด</label>
                                     <input type="time" id="endTime" class="form-control">
                                 </div>
                             </div>
                         </div>
-                        <div class="mt-4 border-top pt-4 text-center">
+                        <div class="mt-4 border-top pt-3 text-center">
                             <span class="text-muted small d-block mb-2">ตัวอย่างการแสดงผล</span>
-                            <div id="previewEvent" class="preview-event text-white" style="background: #222;">ชื่อเวร</div>
+                            <div id="previewEvent" class="preview-event text-white">ชื่อเวร</div>
                         </div>
-                        <button class="btn btn-primary w-100 mt-4 py-2 fw-bold" id="saveTypeBtn">บันทึกข้อมูล</button>
+                        <button class="btn btn-primary w-100 mt-4 py-2 fw-bold" id="saveTypeBtn">บันทึกประเภทเวร</button>
                     </div>
                 </div>
-                <div class="col-md-7">
-                    <div class="minimal-card h-100">
-                        <h5 class="fw-bold mb-3">รายการประเภทเวร</h5>
-                        <div id="shiftTypeList" class="list-group list-group-flush border-top"></div>
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0 p-4 rounded-4">
+                        <h5 class="fw-bold mb-3 text-secondary">รายการประเภทเวรทั้งหมด</h5>
+                        <div id="shiftTypeList" class="list-group list-group-flush"></div>
                     </div>
                 </div>
             </div>
         </section>
 
         <section id="view-holidays" class="view-section">
-            <div class="row justify-content-center g-4">
-                <div class="col-md-5">
-                    <div class="minimal-card">
-                        <h5 class="fw-bold mb-4" id="holidayFormTitle">เพิ่มวันหยุด</h5>
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0 mb-4 p-4 rounded-4">
+                        <h4 class="fw-bold mb-4" id="holidayFormTitle">เพิ่มวันหยุดใหม่</h4>
                         <input type="hidden" id="editHolidayId">
                         <div class="mb-3">
-                            <label class="form-label small text-muted">วันที่หยุด</label>
-                            <input type="date" id="holidayDate" class="form-control">
+                            <label class="form-label small fw-bold">วันที่หยุด</label>
+                            <input type="date" id="holidayDate" class="form-control rounded-3">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label small text-muted">ชื่อวันหยุด / เทศกาล</label>
-                            <input type="text" id="holidayName" class="form-control" placeholder="เช่น วันปีใหม่">
+                            <label class="form-label small fw-bold">ชื่อวันหยุด / เทศกาล</label>
+                            <input type="text" id="holidayName" class="form-control rounded-3" placeholder="เช่น วันปีใหม่, วันหยุดพิเศษ">
                         </div>
-                        <div class="d-flex flex-column gap-2 mt-4">
+                        <div class="d-flex gap-2 mt-4">
+                            <button class="btn btn-danger w-100 py-2 fw-bold d-none" id="cancelEditHolidayBtn">ยกเลิกแก้ไข</button>
                             <button class="btn btn-primary w-100 py-2 fw-bold" id="saveHolidayBtn">บันทึกวันหยุด</button>
-                            <button class="btn btn-outline-dark w-100 py-2 d-none" id="cancelEditHolidayBtn">ยกเลิก</button>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-7">
-                    <div class="minimal-card h-100">
-                        <h5 class="fw-bold mb-3">รายการวันหยุดที่กำหนดเอง</h5>
-                        <div id="customHolidayList" class="list-group list-group-flush border-top"></div>
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0 p-4 rounded-4">
+                        <h5 class="fw-bold mb-3 text-secondary">รายการวันหยุดที่กำหนดเอง (🌴)</h5>
+                        <div id="customHolidayList" class="list-group list-group-flush"></div>
                     </div>
                 </div>
             </div>
@@ -359,21 +242,21 @@
         <section id="view-system" class="view-section">
             <div class="row justify-content-center">
                 <div class="col-md-8">
-                    <div class="minimal-card">
-                        <h5 class="fw-bold mb-4">ตั้งค่าระบบ</h5>
+                    <div class="card shadow-sm border-0 mb-4 p-4 rounded-4">
+                        <h4 class="fw-bold mb-4">ตั้งค่าระบบและปฏิทิน</h4>
                         
-                        <div class="mb-2">
-                            <label class="form-label text-dark fw-medium small d-block mb-3">เลือกวันเริ่มต้นของสัปดาห์</label>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold mb-3">เลือกวันเริ่มต้นของสัปดาห์</label>
                             <div class="d-flex flex-wrap gap-2" id="dayOfWeekSelector">
-                                <button class="btn day-btn" data-day="0">อา.</button>
-                                <button class="btn day-btn" data-day="1">จ.</button>
-                                <button class="btn day-btn" data-day="2">อ.</button>
-                                <button class="btn day-btn" data-day="3">พ.</button>
-                                <button class="btn day-btn" data-day="4">พฤ.</button>
-                                <button class="btn day-btn" data-day="5">ศ.</button>
-                                <button class="btn day-btn" data-day="6">ส.</button>
+                                <button class="btn btn-outline-secondary day-btn" data-day="0">อาทิตย์</button>
+                                <button class="btn btn-outline-secondary day-btn" data-day="1">จันทร์</button>
+                                <button class="btn btn-outline-secondary day-btn" data-day="2">อังคาร</button>
+                                <button class="btn btn-outline-secondary day-btn" data-day="3">พุธ</button>
+                                <button class="btn btn-outline-secondary day-btn" data-day="4">พฤหัสฯ</button>
+                                <button class="btn btn-outline-secondary day-btn" data-day="5">ศุกร์</button>
+                                <button class="btn btn-outline-secondary day-btn" data-day="6">เสาร์</button>
                             </div>
-                            <small class="text-muted mt-3 d-block" style="font-size: 0.75rem;">* ระบบจะบันทึกอัตโนมัติและเปลี่ยนการแสดงผลในหน้าปฏิทิน</small>
+                            <small class="text-muted mt-2 d-block">* ระบบจะจดจำค่าที่คุณเลือกและปรับการแสดงผลในหน้าปฏิทิน</small>
                         </div>
                     </div>
                 </div>
@@ -382,20 +265,20 @@
     </div>
 
     <div class="modal fade" id="addEventModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered px-2">
-            <div class="modal-content border-0 rounded-4" style="box-shadow: 0 10px 40px rgba(0,0,0,0.15);">
-                <div class="modal-header border-0 pb-0 mt-2">
-                    <h6 class="fw-bold mb-0 fs-5">บันทึกเวร <span id="modalDateLabel" class="text-muted fw-normal ms-1 fs-6"></span></h6>
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h6 class="fw-bold mb-0">บันทึกเวร <span id="modalDateLabel" class="text-primary"></span></h6>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body py-4">
-                    <label class="small text-muted mb-2 d-block fw-medium">เลือกประเภทเวร</label>
-                    <div id="modalShiftButtons" class="d-flex flex-wrap gap-2 mb-4"></div>
+                    <label class="small fw-bold mb-2">เลือกประเภทเวร</label>
+                    <div id="modalShiftButtons" class="d-flex flex-wrap gap-2 mb-3"></div>
                     
-                    <label class="small text-muted mb-2 d-block fw-medium">โน้ตเพิ่มเติม (ถ้ามี)</label>
-                    <textarea id="modalNote" class="form-control mb-4" rows="2" placeholder="เพิ่มบันทึกช่วยจำ..."></textarea>
+                    <label class="small fw-bold mb-1">โน้ตเพิ่มเติม (ถ้ามี)</label>
+                    <textarea id="modalNote" class="form-control mb-3" rows="2" placeholder="เช่น รพ. A, เปลี่ยนเวรกับ..."></textarea>
                     
-                    <button id="modalSaveBtn" class="btn btn-primary w-100 py-3 fw-bold fs-6">บันทึกข้อมูล</button>
+                    <button id="modalSaveBtn" class="btn btn-primary w-100 py-2 fw-bold">บันทึกข้อมูล</button>
                 </div>
             </div>
         </div>
@@ -411,11 +294,10 @@
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.getElementById('view-' + viewId).classList.add('active');
             
-            // รอให้ Transition ทำงานเสร็จแล้วค่อย Update ขนาด Calendar
             if (viewId === 'calendar' && window.calendarInstance) {
                 setTimeout(() => {
                     window.calendarInstance.updateSize();
-                }, 150);
+                }, 10);
             }
         }
     </script>

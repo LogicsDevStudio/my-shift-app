@@ -87,20 +87,32 @@ document.addEventListener('DOMContentLoaded', async function() {
                 let calendarEvents = [];
                 
                 // โหลดวันหยุด (ทำครั้งเดียวหรือตามปี)
+                // 1. โหลดวันหยุด (ปรับปรุงเพื่อป้องกัน Error ค่าว่าง)
                 try {
                     const year = new Date().getFullYear();
                     const holidayRes = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/TH`);
-                    if (holidayRes.ok) {
-                        allHolidaysData = await holidayRes.json();
-                        const holidayEvents = allHolidaysData.map(h => ({
-                            title: h.localName,
-                            start: h.date,
-                            display: 'background',
-                            color: '#ffe6e6'
-                        }));
-                        calendarEvents = calendarEvents.concat(holidayEvents);
+                    
+                    if (holidayRes.ok && holidayRes.status !== 204) {
+                        const holidayText = await holidayRes.text(); // อ่านเป็นข้อความดิบก่อน
+                        
+                        if (holidayText && holidayText.trim().length > 0) { // เช็คว่ามีข้อมูลจริงๆ ไหม
+                            allHolidaysData = JSON.parse(holidayText); // ค่อยแปลงเป็น JSON
+                            const holidayEvents = allHolidaysData.map(h => ({
+                                title: h.localName,
+                                start: h.date,
+                                display: 'background',
+                                color: '#ffe6e6'
+                            }));
+                            calendarEvents = calendarEvents.concat(holidayEvents);
+                        } else {
+                            console.warn(`API ไม่มีข้อมูลวันหยุดสำหรับปี ${year}`);
+                        }
+                    } else {
+                        console.warn("ไม่สามารถติดต่อ API วันหยุดได้ หรือไม่มีข้อมูล (Status: " + holidayRes.status + ")");
                     }
-                } catch (e) { console.warn("API วันหยุดมีปัญหา", e); }
+                } catch (e) { 
+                    console.error("ระบบวันหยุดขัดข้อง แต่ระบบเวรจะยังทำงานต่อ:", e); 
+                }
 
                 // โหลดเวรจาก Firebase
                 const querySnapshot = await getDocs(collection(db, "shifts"));

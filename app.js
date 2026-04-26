@@ -14,8 +14,8 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 let calendar;
-let allHolidays = []; // วันหยุดราชการ (API)
-let customHolidaysData = []; // วันหยุดที่กำหนดเอง (Firebase)
+let allHolidays = []; 
+let customHolidaysData = []; 
 let allShiftsData = []; 
 let shiftTypesList = []; 
 
@@ -24,7 +24,6 @@ let currentSelectedShiftType = null;
 let isFastAddMode = false;
 let fastAddCurrentDate = null;
 
-// ค่าเริ่มต้นวันแรกของสัปดาห์ (0 = อาทิตย์, 1 = จันทร์)
 let currentFirstDay = parseInt(localStorage.getItem('calendarFirstDay') || '0');
 
 document.addEventListener('DOMContentLoaded', async function() {
@@ -36,7 +35,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     listenToDatabase(); 
 });
 
-// โหลดข้อมูลวันหยุดจาก API
 async function loadHolidays() {
     try {
         const year = new Date().getFullYear();
@@ -50,9 +48,7 @@ async function loadHolidays() {
     } catch(e) { console.warn("ไม่สามารถโหลดวันหยุดได้", e); }
 }
 
-// ติดตามข้อมูลเวรและวันหยุดกำหนดเองแบบ Realtime
 function listenToDatabase() {
-    // 1. ตารางเวร
     onSnapshot(collection(db, "shifts"), (snapshot) => {
         allShiftsData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         if(calendar) {
@@ -61,10 +57,9 @@ function listenToDatabase() {
         }
     });
 
-    // 2. วันหยุดกำหนดเอง
     onSnapshot(collection(db, "customHolidays"), (snapshot) => {
         customHolidaysData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderCustomHolidaysAdmin(); // อัปเดตหน้าตั้งค่าวันหยุด
+        renderCustomHolidaysAdmin(); 
         if(calendar) {
             calendar.refetchEvents();
             updateSidebarSummary(calendar.view.currentStart);
@@ -72,23 +67,18 @@ function listenToDatabase() {
     });
 }
 
-// --- ส่วนตั้งค่าระบบ (วันแรกของสัปดาห์) ---
 function initSystemSettings() {
     const dayButtons = document.querySelectorAll('.day-btn');
     
-    // ไฮไลต์ปุ่มตามค่าเริ่มต้น
     dayButtons.forEach(btn => {
         if(parseInt(btn.dataset.day) === currentFirstDay) {
             btn.classList.add('active');
         }
         
         btn.addEventListener('click', (e) => {
-            // เอา active ออกจากปุ่มอื่น
             dayButtons.forEach(b => b.classList.remove('active'));
-            // ใส่ active ให้ปุ่มที่กด
             e.target.classList.add('active');
             
-            // บันทึกและอัปเดตปฏิทิน
             currentFirstDay = parseInt(e.target.dataset.day);
             localStorage.setItem('calendarFirstDay', currentFirstDay);
             if(calendar) {
@@ -98,7 +88,6 @@ function initSystemSettings() {
     });
 }
 
-// --- ส่วนจัดการวันหยุด (Custom Holidays) ---
 function initHolidaySettings() {
     const saveBtn = document.getElementById('saveHolidayBtn');
     const cancelBtn = document.getElementById('cancelEditHolidayBtn');
@@ -110,7 +99,7 @@ function initHolidaySettings() {
         
         if(!hDate || !hName) return alert("กรุณาระบุวันที่และชื่อวันหยุดให้ครบถ้วน");
 
-        const data = { date: hDate, name: hName, color: '#ffb3b3' }; // สีพื้นหลังวันหยุดกำหนดเอง
+        const data = { date: hDate, name: hName }; 
 
         if(editId) {
             await updateDoc(doc(db, "customHolidays", editId), data);
@@ -134,12 +123,10 @@ function resetHolidayForm() {
     document.getElementById('holidayFormTitle').innerText = "เพิ่มวันหยุดใหม่";
 }
 
-// Render ลิสต์วันหยุดในหน้าตั้งค่า
 function renderCustomHolidaysAdmin() {
     const list = document.getElementById('customHolidayList');
     list.innerHTML = "";
     
-    // เรียงตามวันที่
     const sorted = [...customHolidaysData].sort((a, b) => new Date(a.date) - new Date(b.date));
 
     sorted.forEach(h => {
@@ -149,7 +136,7 @@ function renderCustomHolidaysAdmin() {
         item.innerHTML = `
             <div>
                 <div class="fw-bold text-danger">${dFormat}</div>
-                <div class="small">${h.name}</div>
+                <div class="small">🌴 ${h.name}</div>
             </div>
             <div>
                 <button class="btn btn-sm btn-outline-secondary me-1 border-0" onclick="editCustomHoliday('${h.id}', '${h.date}', '${h.name}')"><i class="fa-solid fa-pen"></i></button>
@@ -175,7 +162,6 @@ window.deleteCustomHoliday = async (id) => {
     }
 };
 
-// --- ฟังก์ชันจัดการ Fast Add (ลงเวรด่วน) ---
 window.openFastAddModal = () => {
     const today = new Date();
     const localDate = new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
@@ -224,7 +210,6 @@ async function handleFastAdd(typeData) {
     updateFastAddLabel();
 }
 
-// --- ส่วนหน้าการจัดการประเภทเวร (Shift Settings) ---
 function initSettingsView() {
     const saveTypeBtn = document.getElementById('saveTypeBtn');
     
@@ -298,13 +283,12 @@ window.deleteType = async (id) => {
     if(confirm("ยืนยันการลบประเภทเวรนี้?")) await deleteDoc(doc(db, "shiftTypes", id));
 };
 
-// --- ส่วนหน้าปฏิทิน (Calendar View) ---
 function initCalendarView() {
     const calendarEl = document.getElementById('calendar');
     calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'th',
-        firstDay: currentFirstDay, // เซ็ตค่าเริ่มต้นของสัปดาห์
+        firstDay: currentFirstDay,
         headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,listMonth' },
         dateClick: function(info) {
             currentSelectedDate = info.dateStr;
@@ -316,20 +300,29 @@ function initCalendarView() {
         },
         datesSet: (info) => updateSidebarSummary(info.view.currentStart),
         events: function(info, successCallback) {
-            // รวมวันหยุด API
-            const apiEvents = allHolidays.map(h => ({ start: h.date, display: 'background', color: '#ffcccc' }));
-            // รวมวันหยุด Custom
-            const customEvents = customHolidaysData.map(h => ({ start: h.date, title: h.name, display: 'background', color: h.color }));
-            // รวมเวร
+            // ปรับวันหยุดให้แสดงเป็นแถบข้อความ (Block Event)
+            const apiEvents = allHolidays.map(h => ({ 
+                start: h.date, title: `🇹🇭 ${h.localName}`, allDay: true, 
+                display: 'block', backgroundColor: '#ffe6e6', borderColor: '#ffcccc', textColor: '#cc0000',
+                className: 'holiday-event', extendedProps: { isHoliday: true }
+            }));
+            
+            const customEvents = customHolidaysData.map(h => ({ 
+                start: h.date, title: `🌴 ${h.name}`, allDay: true, 
+                display: 'block', backgroundColor: '#e6f7ff', borderColor: '#b3e0ff', textColor: '#005c99',
+                className: 'holiday-event', extendedProps: { isHoliday: true }
+            }));
+
             const shiftEvents = allShiftsData.map(d => ({
-                id: d.id, title: d.name, start: d.date, backgroundColor: d.color,
-                extendedProps: { shiftId: d.id, note: d.note || "" }
+                id: d.id, title: d.name, start: d.date, backgroundColor: d.color, borderColor: d.color,
+                extendedProps: { shiftId: d.id, note: d.note || "", isHoliday: false }
             }));
             
             successCallback([...apiEvents, ...customEvents, ...shiftEvents]);
         },
         eventClick: async function(info) {
-            if(info.event.display === 'background') return; // กันการคลิกวันหยุด
+            if(info.event.extendedProps.isHoliday) return; // ป้องกันการคลิกวันหยุด
+            
             const noteText = info.event.extendedProps.note ? `\nโน้ต: ${info.event.extendedProps.note}` : "";
             if(confirm(`เวร: ${info.event.title}${noteText}\n\nต้องการลบเวรนี้ออกจากปฏิทินใช่หรือไม่?`)) {
                 await deleteDoc(doc(db, "shifts", info.event.extendedProps.shiftId));
@@ -337,6 +330,9 @@ function initCalendarView() {
         }
     });
     calendar.render();
+    
+    // บันทึกตัวแปร calendar ลงใน Window เพื่อให้หน้า HTML สั่ง Update ขนาดได้
+    window.calendarInstance = calendar;
 }
 
 document.getElementById('modalSaveBtn').addEventListener('click', async () => {
@@ -352,7 +348,6 @@ document.getElementById('modalSaveBtn').addEventListener('click', async () => {
     bootstrap.Modal.getInstance(document.getElementById('addEventModal')).hide();
 });
 
-// สรุปข้อมูลข้างปฏิทิน
 function updateSidebarSummary(startDate) {
     if(!startDate) return;
     const m = startDate.getMonth();
@@ -383,18 +378,18 @@ function updateSidebarSummary(startDate) {
     const holBox = document.getElementById('holidayList');
     if(holBox) {
         holBox.innerHTML = "";
-        // ดึงวันหยุด API
+        
         allHolidays.forEach(h => {
             const hDate = new Date(h.date);
             if(hDate.getMonth() === m && hDate.getFullYear() === y) {
-                holBox.innerHTML += `<li class="list-group-item small d-flex justify-content-between text-muted"><span>${hDate.getDate()} - ${h.localName}</span></li>`;
+                holBox.innerHTML += `<li class="list-group-item small d-flex justify-content-between text-muted"><span>🇹🇭 ${hDate.getDate()} - ${h.localName}</span></li>`;
             }
         });
-        // ดึงวันหยุด Custom
+        
         customHolidaysData.forEach(h => {
             const hDate = new Date(h.date);
             if(hDate.getMonth() === m && hDate.getFullYear() === y) {
-                holBox.innerHTML += `<li class="list-group-item small d-flex justify-content-between text-danger fw-bold"><span>${hDate.getDate()} - ${h.name} (กำหนดเอง)</span></li>`;
+                holBox.innerHTML += `<li class="list-group-item small d-flex justify-content-between text-primary fw-bold"><span>🌴 ${hDate.getDate()} - ${h.name}</span></li>`;
             }
         });
     }

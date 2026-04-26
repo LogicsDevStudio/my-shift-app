@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบบันทึกเวรแผนกรังสี</title>
+    <style>
+        body { font-family: sans-serif; max-width: 500px; margin: 20px auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        input, select, button { padding: 10px; width: 100%; box-sizing: border-box; }
+        button { background-color: #007AFF; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .shift-item { padding: 10px; border-bottom: 1px solid #ccc; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <h2>บันทึกเวรปฏิบัติงาน ☢️</h2>
+    
+    <div class="form-group">
+        <label>วันที่:</label>
+        <input type="date" id="dateInput">
+    </div>
+    
+    <div class="form-group">
+        <label>เวร:</label>
+        <select id="shiftInput">
+            <option value="เวรเช้า" data-color="#FF9F0A" data-time="08:00 - 16:00">เวรเช้า (08:00 - 16:00)</option>
+            <option value="เวรบ่าย" data-color="#32ADE6" data-time="16:00 - 00:00">เวรบ่าย (16:00 - 00:00)</option>
+            <option value="เวรดึก" data-color="#30D158" data-time="00:00 - 08:00">เวรดึก (00:00 - 08:00)</option>
+        </select>
+    </div>
+
+    <button id="saveBtn">บันทึกเวร</button>
+
+    <hr>
+
+    <h2>รายการเวรของคุณ</h2>
+    <div id="shiftList">กำลังโหลดข้อมูล...</div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

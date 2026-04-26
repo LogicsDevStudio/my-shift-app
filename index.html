@@ -540,35 +540,27 @@
             body { background: white; }
         }
 
-        /* ─── Responsive Tweaks ─────────────────── */
-        @media (max-width: 768px) {
-            .calendar-card { padding: 16px; }
-            .navbar-brand { font-size: 1.1rem; }
-        }
-
         /* ─── อัปเดตปรับปรุงการแสดงผล (Custom Layout Fixes) ─── */
 
-        /* 1. & 2. ปรับระยะห่างปุ่มเดินหน้าถอยหลัง และปุ่ม Month/List ของปฏิทิน */
         .fc .fc-button-group {
             display: flex;
-            gap: 8px; /* เพิ่มระยะห่างระหว่างปุ่มภายในกลุ่ม */
+            gap: 8px;
         }
         .fc .fc-button-group > .fc-button {
             flex: 1 1 auto;
-            border-radius: var(--radius-sm) !important; /* ให้ปุ่มมีความโค้งมนแยกอิสระจากกัน */
+            border-radius: var(--radius-sm) !important; 
             margin: 0 !important;
         }
         .fc .fc-toolbar-chunk {
             display: flex;
-            gap: 12px; /* เพิ่มระยะห่างระหว่างกลุ่มปุ่มต่างๆ */
+            gap: 12px; 
         }
 
-        /* 3. & 4. ปรับปรุง "สรุปเดือนนี้" และขยายระยะห่างขอบ (Padding) */
         #summaryList {
             padding: 0.5rem 1.25rem 1.25rem 1.25rem !important;
             display: flex;
             flex-direction: column;
-            gap: 10px; /* ระยะห่างระหว่างแต่ละรายการ */
+            gap: 10px; 
         }
         #summaryList > div {
             display: flex;
@@ -587,11 +579,43 @@
             box-shadow: var(--shadow-xs);
             border-color: rgba(99,102,241,0.3);
         }
+
+        /* ─── Responsive Tweaks (เพิ่มการจัดการ Header สมาร์ทโฟน) ─── */
+        @media (max-width: 768px) {
+            .calendar-card { padding: 16px; }
+            .navbar-brand { font-size: 1.1rem; }
+
+            /* ปรับ Header ของ FullCalendar ให้ Responsive ทันทีเมื่อหน้าจอเล็กลง */
+            .fc .fc-toolbar.fc-header-toolbar {
+                flex-direction: column;
+                gap: 16px;
+            }
+            .fc .fc-toolbar-chunk {
+                width: 100%;
+                display: flex;
+                justify-content: center !important;
+            }
+            /* กลุ่มปุ่มย้อนกลับ / วันนี้ / ถัดไป ให้อยู่คนละฝั่งกดง่ายขึ้น */
+            .fc .fc-toolbar-chunk:first-child {
+                justify-content: space-between !important;
+            }
+            /* ขยายปุ่มมุมมอง (เดือน/สัปดาห์) ให้เต็มพื้นที่แนวนอน */
+            .fc .fc-button-group {
+                width: 100%; 
+            }
+            .fc .fc-button-group > .fc-button {
+                flex: 1;
+            }
+            /* ปรับขนาดตัวอักษรชื่อเดือน */
+            .fc .fc-toolbar-title {
+                font-size: 1.25rem !important;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- ═══ NAVBAR ══════════════════════════════════════════════════════ -->
     <nav class="navbar sticky-top">
         <div class="container d-flex align-items-center">
             <button class="btn btn-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#fullScreenMenu">
@@ -604,7 +628,6 @@
         </div>
     </nav>
 
-    <!-- ═══ FAST ADD BAR ════════════════════════════════════════════════ -->
     <div id="fastAddBar" class="fixed-bottom p-3 d-none" style="z-index: 1050;">
         <div class="container">
             <div class="d-flex align-items-center justify-content-between mb-3">
@@ -618,7 +641,6 @@
         </div>
     </div>
 
-    <!-- ═══ FAST ADD DATE MODAL ══════════════════════════════════════════ -->
     <div class="modal fade" id="fastAddDateModal" tabindex="-1">
         <div class="modal-dialog modal-sm modal-dialog-centered">
             <div class="modal-content border-0">
@@ -638,7 +660,6 @@
         </div>
     </div>
 
-    <!-- ═══ OFFCANVAS MENU ═══════════════════════════════════════════════ -->
     <div class="offcanvas offcanvas-top h-100 border-0" tabindex="-1" id="fullScreenMenu">
         <div class="offcanvas-header container mt-3 pb-3">
             <h4 class="offcanvas-title fw-bold">
@@ -699,7 +720,6 @@
                     </div>
                 </div>
 
-                <!-- Menu footer hint -->
                 <div class="text-center mt-5" style="opacity: 0.3;">
                     <i class="fa-solid fa-notes-medical text-white fs-4"></i>
                     <p class="text-white small mt-2 mb-0 fw-medium">Radiology Shift Pro</p>
@@ -708,10 +728,8 @@
         </div>
     </div>
 
-    <!-- ═══ MAIN CONTENT ═════════════════════════════════════════════════ -->
     <div class="container mt-4 mb-5">
 
-        <!-- ── Calendar View ─────────────────────────────────────────── -->
         <section id="view-calendar" class="view-section active">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-2">
                 <h4 class="section-title mb-0">
@@ -757,7 +775,6 @@
             </div>
         </section>
 
-        <!-- ── Settings View ─────────────────────────────────────────── -->
         <section id="view-settings" class="view-section">
             <div class="mb-4">
                 <h4 class="section-title">
@@ -817,7 +834,6 @@
             </div>
         </section>
 
-        <!-- ── Holidays View ─────────────────────────────────────────── -->
         <section id="view-holidays" class="view-section">
             <div class="mb-4">
                 <h4 class="section-title">
@@ -863,7 +879,6 @@
             </div>
         </section>
 
-        <!-- ── System Settings View ──────────────────────────────────── -->
         <section id="view-system" class="view-section">
             <div class="mb-4">
                 <h4 class="section-title">
@@ -901,7 +916,6 @@
         </section>
     </div>
 
-    <!-- ═══ ADD EVENT MODAL ══════════════════════════════════════════════ -->
     <div class="modal fade" id="addEventModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered px-3">
             <div class="modal-content">

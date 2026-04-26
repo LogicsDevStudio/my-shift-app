@@ -3,190 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบจัดการเวรรังสีวิทยา ☢️</title>
+    <title>Radiology Shift Pro ☢️</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
-        body { font-family: 'Prompt', sans-serif; background-color: #f8f9fa; }
-        .calendar-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .fc-event { cursor: pointer; border: none !important; padding: 2px 4px; border-radius: 4px; }
-        .fc-toolbar-title { font-size: 1.25rem !important; font-weight: 600; }
-        .summary-box { font-size: 1.5rem; font-weight: bold; }
-        /* เพิ่มเอฟเฟกต์ให้การ์ดเมนูเวลากดหรือเอาเมาส์ชี้ */
-        .menu-card {
-            transition: transform 0.2s, box-shadow 0.2s;
-            border-radius: 16px;
-            background-color: white;
-        }
-        .menu-card:hover, .menu-card:active {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-            background-color: #f0f4ff;
-        }
-        .menu-icon {
-            font-size: 3rem;
-            margin-bottom: 10px;
-        }
-        .btn-close-lg {
-            width: 2em;
-            height: 2em;
-        }
+        body { font-family: 'Prompt', sans-serif; background-color: #f0f2f5; color: #1c1e21; }
+        .navbar { background-color: #ffffff; border-bottom: 1px solid #e5e5e5; }
+        .calendar-card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        .fc-event { cursor: pointer; border: none !important; padding: 3px 6px; font-weight: 500; border-radius: 6px; font-size: 0.85rem; }
+        .menu-card { transition: transform 0.2s; border-radius: 20px; border: none; cursor: pointer; }
+        .menu-card:active { transform: scale(0.95); }
+        .preview-event { padding: 8px 15px; border-radius: 8px; display: inline-block; font-weight: 500; margin-top: 10px; }
+        .summary-card { border-radius: 12px; border: none; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .view-section { display: none; }
+        .view-section.active { display: block; }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-dark bg-primary shadow-sm mb-4">
-        <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
-                <span class="navbar-toggler-icon"></span>
+    <nav class="navbar navbar-light sticky-top shadow-sm">
+        <div class="container">
+            <button class="btn btn-light rounded-pill px-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#fullScreenMenu">
+                <i class="fa-solid fa-bars me-2"></i> เมนู
             </button>
-            <a class="navbar-brand fw-bold ms-2" href="#">ระบบจัดการเวรรังสี ☢️</a>
+            <span class="navbar-brand fw-bold text-primary mx-auto">Radiology Shift Pro</span>
         </div>
     </nav>
 
-    <div class="offcanvas offcanvas-top h-100" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
-        <div class="offcanvas-header border-bottom shadow-sm px-4">
-            <h4 class="offcanvas-title fw-bold text-primary" id="sidebarMenuLabel">เมนูหลัก (Main Menu)</h4>
-            <button type="button" class="btn-close btn-close-lg" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    <div class="offcanvas offcanvas-top h-100" tabindex="-1" id="fullScreenMenu">
+        <div class="offcanvas-header container mt-2">
+            <h5 class="offcanvas-title fw-bold">เมนูหลัก</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
-        
-        <div class="offcanvas-body" style="background-color: #f4f4f7;">
-            <div class="container mt-3 max-w-900" style="max-width: 900px; margin: 0 auto;">
-                <div class="row g-3">
-                    
-                    <div class="col-6 col-md-4">
-                        <a href="#" class="text-decoration-none" data-bs-dismiss="offcanvas">
-                            <div class="card menu-card text-center h-100 shadow-sm border-0">
-                                <div class="card-body py-4">
-                                    <div class="menu-icon">📅</div>
-                                    <h6 class="text-dark fw-bold mb-0">ปฏิทินเวร</h6>
-                                </div>
-                            </div>
-                        </a>
+        <div class="offcanvas-body bg-light">
+            <div class="container mt-4">
+                <div class="row g-4 text-center">
+                    <div class="col-6 col-md-3">
+                        <div class="card menu-card shadow-sm py-4" onclick="switchView('calendar')" data-bs-dismiss="offcanvas">
+                            <div class="display-5 mb-2">📅</div>
+                            <h6 class="fw-bold">ปฏิทินเวร</h6>
+                        </div>
                     </div>
-
-                    <div class="col-6 col-md-4">
-                        <a href="#" class="text-decoration-none">
-                            <div class="card menu-card text-center h-100 shadow-sm border-0">
-                                <div class="card-body py-4">
-                                    <div class="menu-icon">⚙️</div>
-                                    <h6 class="text-dark fw-bold mb-0">ตั้งค่าเวร</h6>
-                                </div>
-                            </div>
-                        </a>
+                    <div class="col-6 col-md-3">
+                        <div class="card menu-card shadow-sm py-4" onclick="switchView('settings')" data-bs-dismiss="offcanvas">
+                            <div class="display-5 mb-2">⚙️</div>
+                            <h6 class="fw-bold">ตั้งค่าเวร</h6>
+                        </div>
                     </div>
-
-                    <div class="col-6 col-md-4">
-                        <a href="#" class="text-decoration-none">
-                            <div class="card menu-card text-center h-100 shadow-sm border-0">
-                                <div class="card-body py-4">
-                                    <div class="menu-icon">🔤</div>
-                                    <h6 class="text-dark fw-bold mb-0">เปลี่ยนฟอนต์</h6>
-                                </div>
-                            </div>
-                        </a>
+                    <div class="col-6 col-md-3">
+                        <div class="card menu-card shadow-sm py-4">
+                            <div class="display-5 mb-2">🔤</div>
+                            <h6 class="fw-bold">เปลี่ยนฟอนต์</h6>
+                        </div>
                     </div>
-
-                    <div class="col-6 col-md-4">
-                        <a href="#" class="text-decoration-none">
-                            <div class="card menu-card text-center h-100 shadow-sm border-0">
-                                <div class="card-body py-4">
-                                    <div class="menu-icon">🛠️</div>
-                                    <h6 class="text-dark fw-bold mb-0">ตั้งค่าระบบ</h6>
-                                </div>
-                            </div>
-                        </a>
+                    <div class="col-6 col-md-3">
+                        <div class="card menu-card shadow-sm py-4">
+                            <div class="display-5 mb-2">🛠️</div>
+                            <h6 class="fw-bold">ตั้งค่าระบบ</h6>
+                        </div>
                     </div>
-
-                    <div class="col-6 col-md-4">
-                        <a href="#" class="text-decoration-none">
-                            <div class="card menu-card text-center h-100 shadow-sm border-0">
-                                <div class="card-body py-4">
-                                    <div class="menu-icon">📊</div>
-                                    <h6 class="text-dark fw-bold mb-0">สถิติ/รายงาน</h6>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="container-fluid px-4 pb-5">
-        <div class="row g-4">
-            
-            <div class="col-lg-8">
-                <div class="calendar-card h-100">
-                    <div id="calendar"></div>
+    <div class="container mt-4">
+        
+        <section id="view-calendar" class="view-section active">
+            <div class="row g-4">
+                <div class="col-lg-9">
+                    <div class="calendar-card">
+                        <div id="calendar"></div>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card summary-card mb-3">
+                        <div class="card-header bg-white border-0 fw-bold pt-3">📊 สรุปเดือนนี้</div>
+                        <div class="card-body" id="summaryList">
+                            </div>
+                    </div>
+                    <div class="card summary-card border-0">
+                        <div class="card-header bg-white border-0 fw-bold text-danger pt-3">🇹🇭 วันหยุดราชการ</div>
+                        <ul class="list-group list-group-flush" id="holidayList"></ul>
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <div class="col-lg-4">
-                
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-white fw-bold text-primary">➕ เพิ่ม/แก้ไขเวร</div>
-                    <div class="card-body">
+        <section id="view-settings" class="view-section">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0 mb-4 p-4 rounded-4">
+                        <h4 class="fw-bold mb-4">จัดการประเภทเวร</h4>
+                        <input type="hidden" id="editTypeId">
                         <div class="mb-3">
-                            <label class="form-label">วันที่:</label>
-                            <input type="date" id="dateInput" class="form-control">
+                            <label class="form-label small fw-bold">ชื่อเวร (เช่น เวรเช้า, บ่าย, ดึก)</label>
+                            <input type="text" id="typeName" class="form-control rounded-3" placeholder="ระบุชื่อเวร">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">เลือกเวร:</label>
-                            <select id="shiftInput" class="form-select">
-                                <option value="เวรเช้า" data-color="#FF9F0A" data-time="08:00 - 16:00">☀️ เวรเช้า (08:00 - 16:00)</option>
-                                <option value="เวรบ่าย" data-color="#32ADE6" data-time="16:00 - 00:00">🌤️ เวรบ่าย (16:00 - 00:00)</option>
-                                <option value="เวรดึก" data-color="#5856D6" data-time="00:00 - 08:00">🌙 เวรดึก (00:00 - 08:00)</option>
-                                <option value="ออฟ (Off)" data-color="#8E8E93" data-time="-">🌴 วันหยุด (Off)</option>
-                            </select>
+                            <label class="form-label small fw-bold">กำหนดสี</label>
+                            <input type="color" id="typeColor" class="form-control form-control-color w-100 border-0 p-1" value="#007AFF">
                         </div>
-                        <button id="saveBtn" class="btn btn-primary w-100 fw-bold">บันทึกข้อมูล</button>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="toggleTime">
+                                <label class="form-check-label small fw-bold" for="toggleTime">ระบุช่วงเวลา</label>
+                            </div>
+                        </div>
+                        <div id="timeInputSection" style="display: none;">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label class="small">เริ่มต้น</label>
+                                    <input type="time" id="startTime" class="form-control">
+                                </div>
+                                <div class="col-6">
+                                    <label class="small">สิ้นสุด</label>
+                                    <input type="time" id="endTime" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 border-top pt-3 text-center">
+                            <span class="text-muted small d-block mb-2">ตัวอย่างการแสดงผล</span>
+                            <div id="previewEvent" class="preview-event text-white">ชื่อเวร</div>
+                        </div>
+                        <button class="btn btn-primary w-100 mt-4 py-2 fw-bold" id="saveTypeBtn">บันทึกประเภทเวร</button>
                     </div>
                 </div>
-
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-white fw-bold text-success">📊 สรุปเวรประจำเดือน: <span id="summaryMonthTitle" class="text-secondary">-</span></div>
-                    <div class="card-body">
-                        <div class="row text-center g-2">
-                            <div class="col-6">
-                                <div class="p-2 border rounded bg-light">
-                                    <div class="text-muted small">เวรเช้า</div>
-                                    <div class="summary-box text-warning" id="countMorning">0</div>
-                                </div>
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0 p-4 rounded-4">
+                        <h5 class="fw-bold mb-3 text-secondary">รายการประเภทเวรทั้งหมด</h5>
+                        <div id="shiftTypeList" class="list-group list-group-flush">
                             </div>
-                            <div class="col-6">
-                                <div class="p-2 border rounded bg-light">
-                                    <div class="text-muted small">เวรบ่าย</div>
-                                    <div class="summary-box text-info" id="countAfternoon">0</div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="p-2 border rounded bg-light">
-                                    <div class="text-muted small">เวรดึก</div>
-                                    <div class="summary-box" style="color: #5856D6;" id="countNight">0</div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="p-2 border rounded bg-light">
-                                    <div class="text-muted small">ออฟ (Off)</div>
-                                    <div class="summary-box text-secondary" id="countOff">0</div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
+            </div>
+        </section>
+    </div>
 
-                <div class="card shadow-sm border-0">
-                    <div class="card-header bg-white fw-bold text-danger">🇹🇭 วันหยุดราชการในเดือนนี้</div>
-                    <ul class="list-group list-group-flush" id="holidayList">
-                        <li class="list-group-item text-muted text-center py-3">กำลังโหลด...</li>
-                    </ul>
+    <div class="modal fade" id="addEventModal" tabindex="-1">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h6 class="fw-bold mb-0">บันทึกเวรลงวันที่ <span id="modalDateLabel"></span></h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-
+                <div class="modal-body py-4">
+                    <select id="modalShiftSelect" class="form-select mb-3">
+                        </select>
+                    <button id="modalSaveBtn" class="btn btn-primary w-100 py-2 fw-bold">ตกลง</button>
+                </div>
             </div>
         </div>
     </div>
@@ -194,5 +163,12 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
     <script type="module" src="app.js"></script>
+
+    <script>
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.getElementById('view-' + viewId).classList.add('active');
+        }
+    </script>
 </body>
 </html>

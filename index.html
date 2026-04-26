@@ -545,76 +545,11 @@
             .calendar-card { padding: 16px; }
             .navbar-brand { font-size: 1.1rem; }
         }
-
-        /* ─── อัปเดตปรับปรุงการแสดงผล (Custom Layout Fixes) ─── */
-
-        /* 1. & 2. ปรับระยะห่างปุ่มเดินหน้าถอยหลัง และปุ่ม Month/List ของปฏิทิน */
-        .fc .fc-button-group {
-            display: flex;
-            gap: 8px; /* เพิ่มระยะห่างระหว่างปุ่มภายในกลุ่ม */
-        }
-        .fc .fc-button-group > .fc-button {
-            flex: 1 1 auto;
-            border-radius: var(--radius-sm) !important; /* ให้ปุ่มมีความโค้งมนแยกอิสระจากกัน */
-            margin: 0 !important;
-        }
-        .fc .fc-toolbar-chunk {
-            display: flex;
-            gap: 12px; /* เพิ่มระยะห่างระหว่างกลุ่มปุ่มต่างๆ */
-        }
-
-        /* 3. & 4. ปรับปรุง "สรุปเดือนนี้" และขยายระยะห่างขอบ (Padding) */
-        #summaryList {
-            padding: 0.5rem 1.25rem 1.25rem 1.25rem !important;
-            display: flex;
-            flex-direction: column;
-            gap: 10px; /* ระยะห่างระหว่างแต่ละรายการ */
-        }
-        #summaryList > div {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            background: var(--surface-2);
-            border: 1px solid var(--border-soft);
-            border-radius: var(--radius-sm);
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-        #summaryList > div:hover {
-            background: var(--surface);
-            box-shadow: var(--shadow-xs);
-            border-color: rgba(99,102,241,0.3);
-        }
-
-        /* 5. ปรับปรุง "วันหยุดประจำเดือน" ให้สมดุลและเป็นสัดส่วน */
-        #holidayList {
-            padding: 0.5rem 1.25rem 1.25rem 1.25rem !important;
-            margin: 0 !important;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        #holidayList .list-group-item {
-            border: 1px solid rgba(244,63,94,0.15) !important;
-            border-radius: var(--radius-sm) !important;
-            background: rgba(244,63,94,0.02) !important;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-        #holidayList .list-group-item:hover {
-            background: rgba(244,63,94,0.06) !important;
-            transform: translateX(4px);
-        }
     </style>
 </head>
 <body>
 
+    <!-- ═══ NAVBAR ══════════════════════════════════════════════════════ -->
     <nav class="navbar sticky-top">
         <div class="container d-flex align-items-center">
             <button class="btn btn-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#fullScreenMenu">
@@ -627,6 +562,7 @@
         </div>
     </nav>
 
+    <!-- ═══ FAST ADD BAR ════════════════════════════════════════════════ -->
     <div id="fastAddBar" class="fixed-bottom p-3 d-none" style="z-index: 1050;">
         <div class="container">
             <div class="d-flex align-items-center justify-content-between mb-3">
@@ -640,6 +576,7 @@
         </div>
     </div>
 
+    <!-- ═══ FAST ADD DATE MODAL ══════════════════════════════════════════ -->
     <div class="modal fade" id="fastAddDateModal" tabindex="-1">
         <div class="modal-dialog modal-sm modal-dialog-centered">
             <div class="modal-content border-0">
@@ -659,6 +596,7 @@
         </div>
     </div>
 
+    <!-- ═══ OFFCANVAS MENU ═══════════════════════════════════════════════ -->
     <div class="offcanvas offcanvas-top h-100 border-0" tabindex="-1" id="fullScreenMenu">
         <div class="offcanvas-header container mt-3 pb-3">
             <h4 class="offcanvas-title fw-bold">
@@ -719,6 +657,7 @@
                     </div>
                 </div>
 
+                <!-- Menu footer hint -->
                 <div class="text-center mt-5" style="opacity: 0.3;">
                     <i class="fa-solid fa-notes-medical text-white fs-4"></i>
                     <p class="text-white small mt-2 mb-0 fw-medium">Radiology Shift Pro</p>
@@ -727,8 +666,10 @@
         </div>
     </div>
 
+    <!-- ═══ MAIN CONTENT ═════════════════════════════════════════════════ -->
     <div class="container mt-4 mb-5">
 
+        <!-- ── Calendar View ─────────────────────────────────────────── -->
         <section id="view-calendar" class="view-section active">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-2">
                 <h4 class="section-title mb-0">
@@ -756,7 +697,7 @@
                             </span>
                             สรุปเดือนนี้
                         </div>
-                        <div id="summaryList"></div>
+                        <div class="card-body pt-2" id="summaryList"></div>
                     </div>
                     <div class="summary-card">
                         <div class="card-header fw-bold fs-6 d-flex align-items-center gap-2 border-0">
@@ -765,12 +706,13 @@
                             </span>
                             <span class="text-danger">วันหยุดประจำเดือน</span>
                         </div>
-                        <ul class="list-group list-group-flush border-0" id="holidayList"></ul>
+                        <ul class="list-group list-group-flush border-0 mx-3 my-2" id="holidayList"></ul>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- ── Settings View ─────────────────────────────────────────── -->
         <section id="view-settings" class="view-section">
             <div class="mb-4">
                 <h4 class="section-title">
@@ -830,6 +772,7 @@
             </div>
         </section>
 
+        <!-- ── Holidays View ─────────────────────────────────────────── -->
         <section id="view-holidays" class="view-section">
             <div class="mb-4">
                 <h4 class="section-title">
@@ -875,6 +818,7 @@
             </div>
         </section>
 
+        <!-- ── System Settings View ──────────────────────────────────── -->
         <section id="view-system" class="view-section">
             <div class="mb-4">
                 <h4 class="section-title">
@@ -912,6 +856,7 @@
         </section>
     </div>
 
+    <!-- ═══ ADD EVENT MODAL ══════════════════════════════════════════════ -->
     <div class="modal fade" id="addEventModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered px-3">
             <div class="modal-content">

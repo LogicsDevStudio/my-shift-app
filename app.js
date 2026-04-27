@@ -90,9 +90,9 @@ function updateTodayStatus() {
     const todayShifts = allShiftsData.filter(s => s.date === localDate);
 
     if (todayShifts.length > 0) {
-        // ดึงสีของเวรแรกมาเป็นสีหลักของกล่องสถานะ
+        // 👉 ดึงสีจากเวรแรกของวันนี้เป็นสีหลัก (Primary Color)
         const shiftColor = todayShifts[0].color || '#f59e0b';
-
+        
         const shiftBadges = todayShifts.map(s => `
             <span class="badge rounded-pill px-3 py-2 fw-bold ms-1" 
                   style="background:${s.color}; color:#fff; font-size:0.82rem; box-shadow:0 4px 12px ${s.color}55; letter-spacing:0.3px;">
@@ -100,33 +100,32 @@ function updateTodayStatus() {
             </span>`).join('');
 
         const holidayNote = isHoliday
-            ? `<span class="d-block small fw-normal mt-1" style="color:rgba(0,0,0,0.6);">${statusMessages.join(' | ')}</span>`
+            ? `<span class="d-block small fw-normal mt-1" style="color: ${shiftColor}; filter: brightness(0.6);">${statusMessages.join(' | ')}</span>`
             : '';
 
         statusBox.className = "alert fw-bold mb-4 d-flex align-items-center rounded-pill";
-        
-        // ใช้ shiftColor ร่วมกับ Hex Alpha (15, 05, 40) เพื่อสร้างพื้นหลังที่โปร่งใสและดูสมูท
+        // 👉 ใช้สีเวร (shiftColor) ผสมกับค่าความโปร่งแสง Hex (1A=10%, 0D=5%, 4D=30%, 1A=10%)
         statusBox.style.cssText = `
-            background: linear-gradient(135deg, ${shiftColor}15 0%, ${shiftColor}05 100%);
-            border: 1.5px solid ${shiftColor}40;
-            box-shadow: 0 4px 20px ${shiftColor}10;
+            background: linear-gradient(135deg, ${shiftColor}1A 0%, ${shiftColor}0D 100%);
+            border: 1.5px solid ${shiftColor}4D;
+            box-shadow: 0 4px 20px ${shiftColor}1A;
             padding: 14px 24px;
         `;
+        // 👉 ไอคอนและวงกลมใช้สีของเวรแบบทึบและไล่สี
         statusBox.innerHTML = `
             <div class="d-flex align-items-center gap-3 w-100 flex-wrap">
                 <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                     style="width:44px;height:44px;background:${shiftColor};box-shadow:0 6px 16px ${shiftColor}50;">
+                     style="width:44px;height:44px;background:linear-gradient(135deg, ${shiftColor}, ${shiftColor}CC);box-shadow:0 6px 16px ${shiftColor}66;">
                     <i class="fa-solid fa-user-doctor text-white" style="font-size:1.1rem;"></i>
                 </div>
                 <div>
-                    <span style="color:#333;font-size:0.92rem;">วันนี้คุณมีเวร</span>
+                    <span style="color: #334155; font-size: 0.92rem;">วันนี้คุณมีเวร</span>
                     ${holidayNote}
                     <div class="mt-1 d-flex flex-wrap gap-1">${shiftBadges}</div>
                 </div>
             </div>`;
 
     } else if (isHoliday) {
-        // วันหยุดราชการ หรือ วันลา: ใช้สีเขียวมิ้นต์สื่อถึงการพักร้อนและวันหยุด
         statusBox.className = "alert fw-bold mb-4 d-flex align-items-center rounded-pill";
         statusBox.style.cssText = `
             background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
@@ -148,23 +147,22 @@ function updateTodayStatus() {
             </div>`;
 
     } else {
-        // ไม่มีเวร: ใช้สีฟ้าใสๆ สื่อถึงวันว่างชิลๆ
         statusBox.className = "alert fw-bold mb-4 d-flex align-items-center rounded-pill";
         statusBox.style.cssText = `
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            border: 1.5px solid rgba(14,165,233,0.25);
-            box-shadow: 0 4px 20px rgba(14,165,233,0.1);
+            background: linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%);
+            border: 1.5px solid rgba(99,102,241,0.15);
+            box-shadow: 0 4px 20px rgba(99,102,241,0.06);
             padding: 14px 24px;
         `;
         statusBox.innerHTML = `
             <div class="d-flex align-items-center gap-3 w-100">
                 <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                     style="width:44px;height:44px;background:linear-gradient(135deg,#38bdf8,#0ea5e9);box-shadow:0 6px 16px rgba(14,165,233,0.35);">
+                     style="width:44px;height:44px;background:linear-gradient(135deg,#6366f1,#8b5cf6);box-shadow:0 6px 16px rgba(99,102,241,0.35);">
                     <i class="fa-solid fa-mug-hot text-white" style="font-size:1.1rem;"></i>
                 </div>
                 <div>
-                    <span style="color:#0369a1;font-size:0.92rem;">วันนี้ไม่มีเวร</span>
-                    <span class="d-block small fw-normal mt-1" style="color:rgba(3,105,161,0.7);">พักผ่อนได้เต็มที่ Have a good day! ☕</span>
+                    <span style="color:#3730a3;font-size:0.92rem;">วันนี้ไม่มีเวร</span>
+                    <span class="d-block small fw-normal mt-1" style="color:rgba(55,48,163,0.6);">พักผ่อนได้เต็มที่ Have a good day! ☕</span>
                 </div>
             </div>`;
     }

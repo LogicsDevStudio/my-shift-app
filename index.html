@@ -253,10 +253,12 @@
         /* ─── Today Status ───────────────────────── */
         #todayStatusHighlight {
             border-radius: 50px !important;
+            /* ค่าเริ่มต้นก่อนโหลดข้อมูลเสร็จ */
             background: linear-gradient(135deg, rgba(99,102,241,0.06) 0%, rgba(139,92,246,0.04) 100%) !important;
             border: 1.5px solid rgba(99,102,241,0.15) !important;
             box-shadow: none;
             padding: 14px 24px !important;
+            transition: all 0.3s ease; /* เพิ่ม transition ให้เปลี่ยนสีนุ่มนวล */
         }
 
         /* ─── Offcanvas Menu ─────────────────────── */
